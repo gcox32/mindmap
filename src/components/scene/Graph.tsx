@@ -22,6 +22,7 @@ interface GraphProps {
   focusMode: FocusMode
   searchMatchIds: Set<string> | null
   controlsRef: React.RefObject<OrbitControlsImpl | null>
+  interactive: boolean
 }
 
 export function Graph({
@@ -35,6 +36,7 @@ export function Graph({
   focusMode,
   searchMatchIds,
   controlsRef,
+  interactive,
 }: GraphProps) {
   const positioned = useGraphLayout(nodes, edges)
   const nodeById = useMemo(() => new Map(positioned.map((n) => [n.id, n])), [positioned])
@@ -92,6 +94,7 @@ export function Graph({
             isDimmed={isDimmed}
             onHover={onHover}
             onSelect={onSelect}
+            interactive={interactive}
           />
         )
       })}

@@ -1,0 +1,39 @@
+.overview-stats {
+  position: absolute;
+  top: 32px;
+  left: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.overview-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.overview-stat-value {
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1;
+  color: #eaf1ff;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85);
+}
+
+.overview-stat-value--warning {
+  color: #f5c26b;
+}
+
+.overview-stat-value--danger {
+  color: #ff6b6b;
+}
+
+.overview-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7d8aa3;
+  white-space: nowrap;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}

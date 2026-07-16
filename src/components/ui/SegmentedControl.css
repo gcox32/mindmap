@@ -1,0 +1,57 @@
+.pill-group {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pill-btn {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #cbd5e1;
+  border-radius: 999px;
+  padding: 12px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+
+.pill-btn:hover {
+  color: #eaf1ff;
+}
+
+.pill-btn-label {
+  position: relative;
+  z-index: 1;
+}
+
+.pill-btn--active {
+  color: #eaf1ff;
+}
+
+.pill-thumb {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.pill-thumb-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: rgba(143, 184, 255, 0.24);
+  border: 1px solid rgba(143, 184, 255, 0.5);
+  --glass-blur: 6px;
+  backdrop-filter: blur(var(--glass-blur)) url(#liquid-glass) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  box-shadow: var(--glass-reflex-chip);
+}

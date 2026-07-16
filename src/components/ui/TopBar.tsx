@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Pause, Play, TimerReset } from 'lucide-react';
+import './TopBar.css'
 
 interface TopBarProps {
   autoRotate: boolean

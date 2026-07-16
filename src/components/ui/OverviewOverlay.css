@@ -1,0 +1,31 @@
+.overview-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.overview-overlay > * {
+  pointer-events: auto;
+}
+
+.overview-right-column {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-height: calc(100vh - 220px);
+}
+
+/* Shared section heading for the bare Overview panels (breakdown, activity, throughput). */
+.overview-panel-title {
+  margin: 0 0 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7d8aa3;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}

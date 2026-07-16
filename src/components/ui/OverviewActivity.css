@@ -1,0 +1,59 @@
+.overview-activity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.overview-activity-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.overview-activity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px currentColor;
+}
+
+.overview-activity-dot--info {
+  background: #8fb8ff;
+  color: #8fb8ff;
+}
+
+.overview-activity-dot--warning {
+  background: #f5c26b;
+  color: #f5c26b;
+}
+
+.overview-activity-dot--error {
+  background: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.overview-activity-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.overview-activity-message {
+  font-size: 12px;
+  color: #e5e7eb;
+  line-height: 1.4;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.75);
+}
+
+.overview-activity-time {
+  font-size: 10px;
+  color: #7d8aa3;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}

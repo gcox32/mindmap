@@ -78,26 +78,62 @@ in 3D primitives, not DOM.
 ## UI components (`src/components/ui/`)
 
 Plain HTML/CSS/SVG overlay, positioned on top of the canvas. None of these
-know about three.js.
+know about three.js. Each component owns a colocated `.css` file of the same
+name, imported at the top of its `.tsx` — see "Styling" below.
 
 - `TopBar.tsx` — play/pause auto-rotate and reset-view buttons.
 - `SearchBar.tsx` — free-text node search; forwards a ref so `App.tsx` can
   focus it via hotkey.
-- `ActionPills.tsx` — appears once a node is selected; switches
-  `FocusMode` between neighbors/upstream/downstream.
+- `SegmentedControl.tsx` — the generic sliding-thumb pill switcher (a
+  `layoutId`-animated thumb behind whichever option is active). Takes a
+  `groupId` to namespace the shared-layout animation when more than one
+  instance is mounted at once. Used by both `ActionPills` (focus mode) and
+  `ViewModeSwitch` (Overview/Explore).
+- `ActionPills.tsx` — appears once a node is selected; wraps
+  `SegmentedControl` to switch `FocusMode` between neighbors/upstream/downstream.
+- `ViewModeSwitch.tsx` — top-center `SegmentedControl` toggling `ViewMode`
+  between `'explore'` (the interactive graph) and `'overview'` (the bare
+  dashboard overlay below). Always visible, in both modes.
 - `InfoPanel.tsx` — detail panel for the selected node (description,
-  schedule, connected edges grouped by kind).
+  schedule, connected edges grouped by kind). Explore-only.
 - `Legend.tsx` — the node-type/edge-kind color key plus the status line.
+  Explore-only.
 - `LiquidGlassDefs.tsx` — a hidden SVG `<filter>` (feImage displacement map
   + blur) that the glassmorphism panel styling references by `id`; must be
   mounted once at the app root for the CSS `backdrop-filter: url(#liquid-glass)`
   effect to resolve.
+- `OverviewOverlay.tsx` — composes the Overview-mode dashboard: `OverviewStats`
+  (node/edge/error/warning counts, top-left), `OverviewBreakdown` (node-type
+  counts, top-right), `OverviewActivity` (recent activity feed, right),
+  `OverviewStatus` (system status line, bottom-left), and `OverviewThroughput`
+  (24h throughput bar chart, bottom-center). Data comes from
+  `src/data/overviewData.ts`. Deliberately bare — no `.panel` glass-card
+  chrome — per the reference dashboard mockup it's modeled on: large numbers,
+  lists, and the chart float directly over the scene, legible via text-shadow
+  and the scene's own vignette rather than a card background.
+
+## Styling
+
+No CSS framework. Each component's styles live in a colocated `.css` file of
+the same name (`Legend.tsx` → `Legend.css`), imported directly by that
+component — plain global class names, no CSS Modules. `src/index.css` holds
+only what's genuinely shared: the `--glass-*` design tokens, resets, and the
+handful of primitives used by more than one component (`.panel`, `.glass-btn`,
+`.close-btn`, `.type-dot`). Before adding a new rule, check whether it's
+specific to the component you're touching (goes in that component's `.css`)
+or a true cross-cutting primitive (goes in `index.css`) — resist growing
+`index.css` back into a catch-all.
 
 ## Orchestration (`src/App.tsx`)
 
 Owns all cross-cutting state and passes it to `Scene` and the `ui/`
 components as props: `selectedId`, `hoveredId`, `autoRotate`, `focusMode`,
-`searchQuery` (derived into `searchMatchIds`), and `resetSignal`. Also wires
-the global hotkeys (Esc / Cmd+P / Cmd+R / Cmd+K). If you're adding a new
-piece of interaction state, it almost certainly belongs here rather than
-inside a leaf component.
+`searchQuery` (derived into `searchMatchIds`), `resetSignal`, and `viewMode`.
+Also wires the global hotkeys (Esc / Cmd+P / Cmd+R / Cmd+K). Switching
+`viewMode` (via `handleSetViewMode`) clears selection, clears search, and
+bumps `resetSignal` so Overview always opens from a clean, centered framing.
+`viewMode` also flows into `Scene` → `Graph` → `NodeMesh` as an `interactive`
+flag: in Overview mode, `OrbitControls` rotate/pan/zoom are disabled and nodes
+stop attaching click/hover handlers, so it's purely observational. If you're
+adding a new piece of interaction state, it almost certainly belongs here
+rather than inside a leaf component.

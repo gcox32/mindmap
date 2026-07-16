@@ -1,6 +1,7 @@
 import { forwardRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Search } from 'lucide-react'
+import './SearchBar.css'
 
 interface SearchBarProps {
   value: string

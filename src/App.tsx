@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import './App.css'
 import { Scene } from './components/scene/Scene'
 import { InfoPanel } from './components/ui/InfoPanel'
 import { Legend } from './components/ui/Legend'
@@ -7,6 +8,8 @@ import { TopBar } from './components/ui/TopBar'
 import { SearchBar } from './components/ui/SearchBar'
 import { ActionPills } from './components/ui/ActionPills'
 import { LiquidGlassDefs } from './components/ui/LiquidGlassDefs'
+import { ViewModeSwitch, type ViewMode } from './components/ui/ViewModeSwitch'
+import { OverviewOverlay } from './components/ui/OverviewOverlay'
 import { nodes, edges } from './data/dummyData'
 import type { FocusMode } from './graph/traversal'
 
@@ -17,6 +20,7 @@ function App() {
   const [focusMode, setFocusMode] = useState<FocusMode>('neighbors')
   const [searchQuery, setSearchQuery] = useState('')
   const [resetSignal, setResetSignal] = useState(0)
+  const [viewMode, setViewMode] = useState<ViewMode>('explore')
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const selectedNode = nodes.find((n) => n.id === selectedId) ?? null
@@ -38,6 +42,12 @@ function App() {
     setResetSignal((v) => v + 1)
   }
 
+  const handleSetViewMode = (mode: ViewMode) => {
+    setViewMode(mode)
+    handleSelect(null)
+    setSearchQuery('')
+  }
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -57,6 +67,12 @@ function App() {
       } else if (e.key.toLowerCase() === 'k') {
         e.preventDefault()
         searchInputRef.current?.focus()
+      } else if (e.key.toLowerCase() === 'o') {
+        e.preventDefault()
+        handleSetViewMode('overview')
+      } else if (e.key.toLowerCase() === 'e') {
+        e.preventDefault()
+        handleSetViewMode('explore')
       }
     }
 
@@ -68,7 +84,9 @@ function App() {
     ? `Inspecting ${selectedNode.label}`
     : hoveredNode
       ? hoveredNode.label
-      : `${nodes.length} nodes · ${edges.length} connections`
+      : `Legend`
+
+  const isExplore = viewMode === 'explore'
 
   return (
     <div className="app">
@@ -84,56 +102,72 @@ function App() {
         focusMode={focusMode}
         searchMatchIds={searchMatchIds}
         resetSignal={resetSignal}
+        viewMode={viewMode}
       />
 
-      <TopBar
-        autoRotate={autoRotate}
-        onToggleAutoRotate={() => setAutoRotate((v) => !v)}
-        onResetView={handleResetView}
-      />
+      <ViewModeSwitch viewMode={viewMode} onChange={handleSetViewMode} />
 
-      <InfoPanel
-        node={selectedNode}
-        nodes={nodes}
-        edges={edges}
-        onSelect={handleSelect}
-        onClose={() => handleSelect(null)}
-      />
-
-      <Legend statusLine={statusLine} />
-
-      <div className="bottom-stack">
-        <motion.div layout transition={{ duration: 0.3, ease: 'easeInOut' }} className="bottom-stack-inner">
-          <AnimatePresence initial={false}>
-            {selectedNode && (
-              <motion.div
-                key="action-pills"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2, ease: 'easeInOut' }}
-                style={{ overflow: 'hidden', width: '100%' }}
-              >
-                <ActionPills
-                  nodeLabel={selectedNode.label}
-                  focusMode={focusMode}
-                  onSetFocusMode={setFocusMode}
-                  onClose={() => handleSelect(null)}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <motion.div layout style={{ width: '100%' }}>
-            <SearchBar
-              ref={searchInputRef}
-              value={searchQuery}
-              matchCount={searchMatchIds ? searchMatchIds.size : null}
-              onChange={setSearchQuery}
+      <AnimatePresence mode="wait" initial={false}>
+        {isExplore ? (
+          <motion.div
+            key="explore-chrome"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+          >
+            <TopBar
+              autoRotate={autoRotate}
+              onToggleAutoRotate={() => setAutoRotate((v) => !v)}
+              onResetView={handleResetView}
             />
+
+            <InfoPanel
+              node={selectedNode}
+              nodes={nodes}
+              edges={edges}
+              onSelect={handleSelect}
+              onClose={() => handleSelect(null)}
+            />
+
+            <Legend statusLine={statusLine} />
+
+            <div className="bottom-stack">
+              <motion.div layout transition={{ duration: 0.3, ease: 'easeInOut' }} className="bottom-stack-inner">
+                <AnimatePresence initial={false}>
+                  {selectedNode && (
+                    <motion.div
+                      key="action-pills"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2, ease: 'easeInOut' }}
+                      style={{ overflow: 'hidden', width: '100%' }}
+                    >
+                      <ActionPills
+                        focusMode={focusMode}
+                        onSetFocusMode={setFocusMode}
+                        onClose={() => handleSelect(null)}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <motion.div layout style={{ width: '100%' }}>
+                  <SearchBar
+                    ref={searchInputRef}
+                    value={searchQuery}
+                    matchCount={searchMatchIds ? searchMatchIds.size : null}
+                    onChange={setSearchQuery}
+                  />
+                </motion.div>
+              </motion.div>
+            </div>
           </motion.div>
-        </motion.div>
-      </div>
+        ) : (
+          <OverviewOverlay key="overview-chrome" nodes={nodes} edges={edges} />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

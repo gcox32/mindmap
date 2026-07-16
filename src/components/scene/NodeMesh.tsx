@@ -13,6 +13,7 @@ interface NodeMeshProps {
   isDimmed: boolean
   onHover: (id: string | null) => void
   onSelect: (id: string) => void
+  interactive: boolean
 }
 
 // Exponential-damping rate for hover/select/dim transitions — high enough to
@@ -22,7 +23,7 @@ const SMOOTH_LAMBDA = 10
 const NORMAL_TEXT_COLOR = new THREE.Color('#eaf1ff')
 const DIMMED_TEXT_COLOR = new THREE.Color('#4a5568')
 
-export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSelect }: NodeMeshProps) {
+export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSelect, interactive }: NodeMeshProps) {
   const glowRef = useRef<THREE.Sprite>(null)
   const coreRef = useRef<THREE.Sprite>(null)
   const shellRef = useRef<THREE.Mesh>(null)
@@ -104,18 +105,30 @@ export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSel
       <sprite
         ref={coreRef}
         scale={coreScale}
-        onPointerOver={(e) => {
-          e.stopPropagation()
-          onHover(node.id)
-        }}
-        onPointerOut={(e) => {
-          e.stopPropagation()
-          onHover(null)
-        }}
-        onClick={(e) => {
-          e.stopPropagation()
-          onSelect(node.id)
-        }}
+        onPointerOver={
+          interactive
+            ? (e) => {
+                e.stopPropagation()
+                onHover(node.id)
+              }
+            : undefined
+        }
+        onPointerOut={
+          interactive
+            ? (e) => {
+                e.stopPropagation()
+                onHover(null)
+              }
+            : undefined
+        }
+        onClick={
+          interactive
+            ? (e) => {
+                e.stopPropagation()
+                onSelect(node.id)
+              }
+            : undefined
+        }
       >
         <spriteMaterial
           map={texture}

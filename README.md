@@ -31,7 +31,7 @@ The two things worth understanding first, regardless of what you're working on: 
 
 ### UI chrome
 
-- **`src/index.css`** — one global stylesheet, BEM-ish classes, holds the liquid-glass design tokens/recipes (`--glass-*` custom properties, `.panel`, `.glass-btn`).
+- **`src/index.css`** — global tokens/resets and the handful of primitives shared by more than one component (`--glass-*` custom properties, `.panel`, `.glass-btn`, `.close-btn`, `.type-dot`). Everything component-specific lives in that component's own colocated `.css` file (e.g. `Legend.tsx` + `Legend.css`), imported directly at the top of the `.tsx` file — see `docs/FRONTEND.md`.
 - **`TopBar.tsx`, `InfoPanel.tsx`, `Legend.tsx`, `SearchBar.tsx`, `ActionPills.tsx`** — thin, presentational panels driven entirely by props from `App.tsx`.
 - **`LiquidGlassDefs.tsx`** + **`src/assets/liquidGlassDisplacement.ts`** — the hidden SVG filter (feImage/feDisplacementMap) that drives the refraction effect on `.panel`/`.glass-btn` surfaces, referenced via `backdrop-filter: url(#liquid-glass)`.
 

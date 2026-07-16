@@ -1,0 +1,48 @@
+.overview-status {
+  position: absolute;
+  bottom: 32px;
+  left: 32px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 360px;
+}
+
+.overview-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.overview-status-dot--nominal {
+  background: #6ee7a8;
+  color: #6ee7a8;
+}
+
+.overview-status-dot--degraded {
+  background: #f5c26b;
+  color: #f5c26b;
+}
+
+.overview-status-dot--critical {
+  background: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.overview-status-message {
+  font-size: 15px;
+  font-weight: 600;
+  color: #eaf1ff;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+}
+
+.overview-status-detail {
+  font-size: 12px;
+  color: #9ca3af;
+  line-height: 1.5;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}

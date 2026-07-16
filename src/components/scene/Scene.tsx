@@ -5,6 +5,7 @@ import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { GraphEdge, GraphNode } from '../../data/types'
 import type { FocusMode } from '../../graph/traversal'
+import type { ViewMode } from '../ui/ViewModeSwitch'
 import { Graph } from './Graph'
 import { OrbitHalo } from './OrbitHalo'
 import { CameraReset } from './CameraReset'
@@ -21,6 +22,7 @@ interface SceneProps {
   focusMode: FocusMode
   searchMatchIds: Set<string> | null
   resetSignal: number
+  viewMode: ViewMode
 }
 
 export function Scene({
@@ -34,13 +36,15 @@ export function Scene({
   focusMode,
   searchMatchIds,
   resetSignal,
+  viewMode,
 }: SceneProps) {
   const controlsRef = useRef<OrbitControlsImpl>(null)
+  const isExplore = viewMode === 'explore'
 
   return (
     <Canvas
       camera={{ position: [0, 40, 220], fov: 50, near: 0.1, far: 2000 }}
-      onPointerMissed={() => onSelect(null)}
+      onPointerMissed={() => isExplore && onSelect(null)}
       gl={{ antialias: true }}
     >
       <color attach="background" args={[BACKGROUND_COLOR]} />
@@ -65,6 +69,7 @@ export function Scene({
           focusMode={focusMode}
           searchMatchIds={searchMatchIds}
           controlsRef={controlsRef}
+          interactive={isExplore}
         />
       </Suspense>
 
@@ -72,8 +77,11 @@ export function Scene({
         ref={controlsRef}
         enableDamping
         dampingFactor={0.025}
-        autoRotate={autoRotate}
-        autoRotateSpeed={0.4}
+        autoRotate={isExplore ? autoRotate : true}
+        autoRotateSpeed={isExplore ? 0.4 : 0.15}
+        enableRotate={isExplore}
+        enablePan={isExplore}
+        enableZoom={isExplore}
         minDistance={40}
         maxDistance={550}
       />
