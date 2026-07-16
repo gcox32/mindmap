@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Scene } from './components/Scene'
 import { InfoPanel } from './components/InfoPanel'
@@ -17,6 +17,7 @@ function App() {
   const [focusMode, setFocusMode] = useState<FocusMode>('neighbors')
   const [searchQuery, setSearchQuery] = useState('')
   const [resetSignal, setResetSignal] = useState(0)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const selectedNode = nodes.find((n) => n.id === selectedId) ?? null
   const hoveredNode = nodes.find((n) => n.id === hoveredId) ?? null
@@ -31,6 +32,37 @@ function App() {
     setSelectedId(id)
     setFocusMode('neighbors')
   }
+
+  const handleResetView = () => {
+    handleSelect(null)
+    setResetSignal((v) => v + 1)
+  }
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleSelect(null)
+        return
+      }
+
+      const isMod = e.metaKey || e.ctrlKey
+      if (!isMod) return
+
+      if (e.key.toLowerCase() === 'p') {
+        e.preventDefault()
+        setAutoRotate((v) => !v)
+      } else if (e.key.toLowerCase() === 'r') {
+        e.preventDefault()
+        handleResetView()
+      } else if (e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const statusLine = selectedNode
     ? `Inspecting ${selectedNode.label}`
@@ -57,10 +89,7 @@ function App() {
       <TopBar
         autoRotate={autoRotate}
         onToggleAutoRotate={() => setAutoRotate((v) => !v)}
-        onResetView={() => {
-          handleSelect(null)
-          setResetSignal((v) => v + 1)
-        }}
+        onResetView={handleResetView}
       />
 
       <InfoPanel
@@ -97,6 +126,7 @@ function App() {
 
           <motion.div layout style={{ width: '100%' }}>
             <SearchBar
+              ref={searchInputRef}
               value={searchQuery}
               matchCount={searchMatchIds ? searchMatchIds.size : null}
               onChange={setSearchQuery}

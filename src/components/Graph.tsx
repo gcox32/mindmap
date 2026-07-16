@@ -2,13 +2,12 @@ import { useMemo } from 'react'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { GraphEdge, GraphNode } from '../data/types'
 import { useGraphLayout } from '../graph/useGraphLayout'
-import { computeDegree, computeFocusSet, type FocusMode } from '../graph/traversal'
+import { computeFocusSet, type FocusMode } from '../graph/traversal'
 import { getNodeRadius } from '../graph/style'
 import { NodeMesh } from './NodeMesh'
 import { EdgeLine } from './EdgeLine'
 import { CameraFocus } from './CameraFocus'
 
-const BADGE_DEGREE_THRESHOLD = 5
 const FOCUS_DISTANCE_SCALE = 9
 const FOCUS_DISTANCE_PADDING = 36
 
@@ -39,7 +38,6 @@ export function Graph({
 }: GraphProps) {
   const positioned = useGraphLayout(nodes, edges)
   const nodeById = useMemo(() => new Map(positioned.map((n) => [n.id, n])), [positioned])
-  const degreeById = useMemo(() => computeDegree(edges), [edges])
 
   const selectedNode = selectedId ? nodeById.get(selectedId) : undefined
   const focusDistance = selectedNode
@@ -85,8 +83,6 @@ export function Graph({
 
       {positioned.map((node) => {
         const isDimmed = !!highlightIds && !highlightIds.has(node.id)
-        const degree = degreeById.get(node.id) ?? 0
-        const showBadge = node.type === 'nucleus' || degree >= BADGE_DEGREE_THRESHOLD
         return (
           <NodeMesh
             key={node.id}
@@ -94,7 +90,6 @@ export function Graph({
             isHovered={hoveredId === node.id}
             isSelected={selectedId === node.id}
             isDimmed={isDimmed}
-            badgeCount={showBadge ? degree : undefined}
             onHover={onHover}
             onSelect={onSelect}
           />

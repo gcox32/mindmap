@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Billboard, Html, Text } from '@react-three/drei'
+import { Billboard, Text } from '@react-three/drei'
 import * as THREE from 'three'
 import type { PositionedNode } from '../data/types'
 import { NODE_COLOR, getNodeRadius, hashToUnit } from '../graph/style'
@@ -11,7 +11,6 @@ interface NodeMeshProps {
   isHovered: boolean
   isSelected: boolean
   isDimmed: boolean
-  badgeCount?: number
   onHover: (id: string | null) => void
   onSelect: (id: string) => void
 }
@@ -23,7 +22,7 @@ const SMOOTH_LAMBDA = 10
 const NORMAL_TEXT_COLOR = new THREE.Color('#eaf1ff')
 const DIMMED_TEXT_COLOR = new THREE.Color('#4a5568')
 
-export function NodeMesh({ node, isHovered, isSelected, isDimmed, badgeCount, onHover, onSelect }: NodeMeshProps) {
+export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSelect }: NodeMeshProps) {
   const glowRef = useRef<THREE.Sprite>(null)
   const coreRef = useRef<THREE.Sprite>(null)
   const shellRef = useRef<THREE.Mesh>(null)
@@ -136,14 +135,6 @@ export function NodeMesh({ node, isHovered, isSelected, isDimmed, badgeCount, on
       )}
 
       {node.type === 'nucleus' && <pointLight color={color} intensity={35} distance={140} decay={2} />}
-
-      {badgeCount !== undefined && (
-        <Html position={[baseRadius * 0.75, baseRadius * 0.75, 0]} center sprite distanceFactor={90} zIndexRange={[10, 0]}>
-          <div className="node-badge" style={{ opacity: isDimmed ? 0 : 1 }}>
-            {badgeCount}
-          </div>
-        </Html>
-      )}
 
       <Billboard position={[0, baseRadius + 4, 0]}>
         <Text

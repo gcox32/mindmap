@@ -24,7 +24,7 @@ export function Legend({ statusLine }: LegendProps) {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
-    <motion.div layout transition={{ duration: 0.3, ease: 'easeInOut' }} className="panel legend">
+    <div className="panel legend">
       <div className="legend-header">
         <div className="legend-status">{statusLine}</div>
         <motion.button
@@ -43,10 +43,10 @@ export function Legend({ statusLine }: LegendProps) {
           <motion.div
             key="legend-content"
             className="legend-content"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
           >
             <div className="legend-divider" />
             <div className="legend-section">
@@ -69,6 +69,6 @@ export function Legend({ statusLine }: LegendProps) {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   )
 }

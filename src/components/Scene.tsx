@@ -71,7 +71,7 @@ export function Scene({
       <OrbitControls
         ref={controlsRef}
         enableDamping
-        dampingFactor={0.08}
+        dampingFactor={0.025}
         autoRotate={autoRotate}
         autoRotateSpeed={0.4}
         minDistance={40}

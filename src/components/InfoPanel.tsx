@@ -19,6 +19,8 @@ const EDGE_KIND_LABEL: Record<GraphEdge['kind'], string> = {
   cycles: 'cycles back into',
 }
 
+const SPRING_GENTLE = { type: 'spring', stiffness: 300, damping: 28 } as const
+
 export function InfoPanel({ node, nodes, edges, onSelect, onClose }: InfoPanelProps) {
   const nodeById = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes])
 
@@ -37,7 +39,7 @@ export function InfoPanel({ node, nodes, edges, onSelect, onClose }: InfoPanelPr
   return (
     <motion.div
       layout
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      transition={SPRING_GENTLE}
       className={`panel info-panel${node ? '' : ' info-panel--empty'}`}
     >
       {node && (
@@ -56,20 +58,20 @@ export function InfoPanel({ node, nodes, edges, onSelect, onClose }: InfoPanelPr
         {!node ? (
           <motion.div
             key="empty"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.97 }}
+            transition={SPRING_GENTLE}
           >
             <p className="hint">Click a node to inspect it. Drag to orbit, scroll to zoom.</p>
           </motion.div>
         ) : (
           <motion.div
             key={node.id}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.15 }}
+            initial={{ opacity: 0, y: 6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.97 }}
+            transition={SPRING_GENTLE}
           >
             <div className="info-header">
               <span className="type-dot" style={{ background: NODE_COLOR[node.type] }} />

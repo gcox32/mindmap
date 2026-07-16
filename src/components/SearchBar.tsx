@@ -1,3 +1,4 @@
+import { forwardRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Search } from 'lucide-react'
 
@@ -7,15 +8,27 @@ interface SearchBarProps {
   onChange: (value: string) => void
 }
 
-export function SearchBar({ value, matchCount, onChange }: SearchBarProps) {
+export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function SearchBar(
+  { value, matchCount, onChange },
+  ref,
+) {
+  const [isFocused, setIsFocused] = useState(false)
+
   return (
-    <div className="panel search-bar">
+    <motion.div
+      className="panel search-bar"
+      animate={{ scale: isFocused ? 1.05 : 1 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+    >
       <Search />
       <input
+        ref={ref}
         type="text"
         placeholder="Search nodes..."
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
       />
       <AnimatePresence>
         {value && (
@@ -38,6 +51,6 @@ export function SearchBar({ value, matchCount, onChange }: SearchBarProps) {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   )
-}
+})
