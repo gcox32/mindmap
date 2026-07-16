@@ -2,14 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Settings } from 'lucide-react'
 import './SettingsPopover.css'
-
-export interface SceneSettings {
-  showOrbitHalos: boolean
-}
-
-export const DEFAULT_SCENE_SETTINGS: SceneSettings = {
-  showOrbitHalos: true,
-}
+import type { SceneSettings } from './constants'
 
 interface SettingsPopoverProps {
   settings: SceneSettings
