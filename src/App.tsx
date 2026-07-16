@@ -9,6 +9,7 @@ import { SearchBar } from '@/components/explore/SearchBar'
 import { ActionPills } from '@/components/explore/ActionPills'
 import { LiquidGlassDefs } from '@/components/ui/LiquidGlassDefs'
 import { ViewModeSwitch, type ViewMode } from '@/components/ui/ViewModeSwitch'
+import { DEFAULT_SCENE_SETTINGS, type SceneSettings } from '@/components/explore/SettingsPopover'
 import { OverviewOverlay } from '@/components/overview/OverviewOverlay'
 import { nodes, edges } from '@/data/dummyData'
 import type { FocusMode } from '@/graph/traversal'
@@ -21,6 +22,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [resetSignal, setResetSignal] = useState(0)
   const [viewMode, setViewMode] = useState<ViewMode>('explore')
+  const [settings, setSettings] = useState<SceneSettings>(DEFAULT_SCENE_SETTINGS)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const selectedNode = nodes.find((n) => n.id === selectedId) ?? null
@@ -105,6 +107,7 @@ function App() {
         searchMatchIds={searchMatchIds}
         resetSignal={resetSignal}
         viewMode={viewMode}
+        settings={settings}
       />
 
       <ViewModeSwitch viewMode={viewMode} onChange={handleSetViewMode} />
@@ -122,6 +125,8 @@ function App() {
               autoRotate={autoRotate}
               onToggleAutoRotate={() => setAutoRotate((v) => !v)}
               onResetView={handleResetView}
+              settings={settings}
+              onChangeSettings={setSettings}
             />
 
             <InfoPanel

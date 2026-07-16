@@ -6,6 +6,7 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { GraphEdge, GraphNode } from '@/data/types'
 import type { FocusMode } from '@/graph/traversal'
 import type { ViewMode } from '@/components/ui/ViewModeSwitch'
+import type { SceneSettings } from '@/components/explore/SettingsPopover'
 import { Graph } from './Graph'
 import { CameraReset } from './CameraReset'
 import { BACKGROUND_COLOR } from '@/graph/style'
@@ -22,6 +23,7 @@ interface SceneProps {
   searchMatchIds: Set<string> | null
   resetSignal: number
   viewMode: ViewMode
+  settings: SceneSettings
 }
 
 export function Scene({
@@ -36,6 +38,7 @@ export function Scene({
   searchMatchIds,
   resetSignal,
   viewMode,
+  settings,
 }: SceneProps) {
   const controlsRef = useRef<OrbitControlsImpl>(null)
   const isExplore = viewMode === 'explore'
@@ -68,6 +71,7 @@ export function Scene({
           searchMatchIds={searchMatchIds}
           controlsRef={controlsRef}
           interactive={isExplore}
+          settings={settings}
         />
       </Suspense>
 

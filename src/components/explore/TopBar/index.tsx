@@ -1,16 +1,19 @@
 import { motion } from 'framer-motion'
 import { Pause, Play, TimerReset } from 'lucide-react';
+import { SettingsPopover, type SceneSettings } from '@/components/explore/SettingsPopover'
 import './TopBar.css'
 
 interface TopBarProps {
   autoRotate: boolean
   onToggleAutoRotate: () => void
   onResetView: () => void
+  settings: SceneSettings
+  onChangeSettings: (settings: SceneSettings) => void
 }
 
 const TAP_TRANSITION = { duration: 0.15 }
 
-export function TopBar({ autoRotate, onToggleAutoRotate, onResetView }: TopBarProps) {
+export function TopBar({ autoRotate, onToggleAutoRotate, onResetView, settings, onChangeSettings }: TopBarProps) {
   return (
     <header className="top-bar">
       <div className="top-bar-controls">
@@ -37,6 +40,7 @@ export function TopBar({ autoRotate, onToggleAutoRotate, onResetView }: TopBarPr
         >
           <TimerReset />
         </motion.button>
+        <SettingsPopover settings={settings} onChange={onChangeSettings} />
       </div>
     </header>
   )

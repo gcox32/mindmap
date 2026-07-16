@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { EDGE_COLOR, NODE_COLOR } from '@/graph/style'
+import { ChevronRight, ChevronDown } from 'lucide-react'
 import './Legend.css'
 
 interface LegendProps {
@@ -35,7 +36,7 @@ export function Legend({ statusLine }: LegendProps) {
           whileTap={{ scale: 0.86 }}
           transition={{ duration: 0.15 }}
         >
-          {collapsed ? '▸' : '▾'}
+          {collapsed ? <ChevronRight /> : <ChevronDown />}
         </motion.button>
       </div>
 

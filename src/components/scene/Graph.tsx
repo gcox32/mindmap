@@ -4,9 +4,11 @@ import type { GraphEdge, GraphNode } from '@/data/types'
 import { useGraphLayout } from '@/graph/useGraphLayout'
 import { computeFocusSet, type FocusMode } from '@/graph/traversal'
 import { getNodeRadius } from '@/graph/style'
+import type { SceneSettings } from '@/components/explore/SettingsPopover'
 import { NodeMesh } from './NodeMesh'
 import { EdgeLine } from './EdgeLine'
 import { CameraFocus } from './CameraFocus'
+import { OrbitHalo } from './OrbitHalo'
 
 const FOCUS_DISTANCE_SCALE = 9
 const FOCUS_DISTANCE_PADDING = 36
@@ -23,6 +25,7 @@ interface GraphProps {
   searchMatchIds: Set<string> | null
   controlsRef: React.RefObject<OrbitControlsImpl | null>
   interactive: boolean
+  settings: SceneSettings
 }
 
 export function Graph({
@@ -37,6 +40,7 @@ export function Graph({
   searchMatchIds,
   controlsRef,
   interactive,
+  settings,
 }: GraphProps) {
   const positioned = useGraphLayout(nodes, edges)
   const nodeById = useMemo(() => new Map(positioned.map((n) => [n.id, n])), [positioned])
@@ -99,7 +103,12 @@ export function Graph({
         )
       })}
 
-
+      {settings.showOrbitHalos &&
+        positioned
+          .filter((node) => node.type === 'nucleus')
+          .map((node) => (
+            <OrbitHalo key={`halo-${node.id}`} position={[node.x, node.y, node.z]} radius={getNodeRadius(node)} />
+          ))}
     </group>
   )
 }
