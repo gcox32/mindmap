@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import type { FocusMode } from '../graph/traversal'
+import type { FocusMode } from '../../graph/traversal'
 
 interface ActionPillsProps {
   nodeLabel: string

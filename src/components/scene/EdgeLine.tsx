@@ -3,9 +3,9 @@ import { useFrame } from '@react-three/fiber'
 import { Line } from '@react-three/drei'
 import * as THREE from 'three'
 import type { Line2, LineMaterial } from 'three-stdlib'
-import type { GraphEdge, PositionedNode } from '../data/types'
-import { EDGE_COLOR, EDGE_DASHED, hashToUnit, widthMultiplierForVolume } from '../graph/style'
-import { getGlowTexture } from '../graph/textures'
+import type { GraphEdge, PositionedNode } from '../../data/types'
+import { EDGE_COLOR, EDGE_DASHED, hashToUnit, widthMultiplierForVolume } from '../../graph/style'
+import { getGlowTexture } from '../../graph/textures'
 
 interface EdgeLineProps {
   edge: GraphEdge

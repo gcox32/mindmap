@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { EDGE_COLOR, NODE_COLOR } from '../graph/style'
+import { EDGE_COLOR, NODE_COLOR } from '../../graph/style'
 
 interface LegendProps {
   statusLine: string

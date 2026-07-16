@@ -508,6 +508,7 @@ body,
   color: #9ca3af;
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.1);
+  margin-left: 64px;
 }
 
 .node-badge {

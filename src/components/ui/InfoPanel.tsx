@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import type { GraphEdge, GraphNode } from '../data/types'
-import { NODE_COLOR } from '../graph/style'
-import { computeFocusSet } from '../graph/traversal'
+import type { GraphEdge, GraphNode } from '../../data/types'
+import { NODE_COLOR } from '../../graph/style'
+import { computeFocusSet } from '../../graph/traversal'
 
 interface InfoPanelProps {
   node: GraphNode | null

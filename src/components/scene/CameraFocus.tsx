@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
-import { useCancelOnUserInput } from '../graph/useCancelOnUserInput'
+import { useCancelOnUserInput } from '../../graph/useCancelOnUserInput'
 
 interface CameraFocusProps {
   /** Identity of the current focus request (e.g. selected node id). A change here (re)starts the fly-in. */

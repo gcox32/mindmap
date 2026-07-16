@@ -3,12 +3,12 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
-import type { GraphEdge, GraphNode } from '../data/types'
-import type { FocusMode } from '../graph/traversal'
+import type { GraphEdge, GraphNode } from '../../data/types'
+import type { FocusMode } from '../../graph/traversal'
 import { Graph } from './Graph'
 import { OrbitHalo } from './OrbitHalo'
 import { CameraReset } from './CameraReset'
-import { BACKGROUND_COLOR } from '../graph/style'
+import { BACKGROUND_COLOR } from '../../graph/style'
 
 interface SceneProps {
   nodes: GraphNode[]
