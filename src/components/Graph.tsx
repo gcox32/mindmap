@@ -19,6 +19,7 @@ interface GraphProps {
   hoveredId: string | null
   onHover: (id: string | null) => void
   onSelect: (id: string) => void
+  autoRotate: boolean
   focusMode: FocusMode
   searchMatchIds: Set<string> | null
   controlsRef: React.RefObject<OrbitControlsImpl | null>
@@ -31,6 +32,7 @@ export function Graph({
   hoveredId,
   onHover,
   onSelect,
+  autoRotate,
   focusMode,
   searchMatchIds,
   controlsRef,
@@ -76,6 +78,7 @@ export function Graph({
             to={to}
             isHighlighted={isHighlighted}
             isDimmed={isDimmed}
+            autoRotate={autoRotate}
           />
         )
       })}

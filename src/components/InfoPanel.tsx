@@ -41,9 +41,15 @@ export function InfoPanel({ node, nodes, edges, onSelect, onClose }: InfoPanelPr
       className={`panel info-panel${node ? '' : ' info-panel--empty'}`}
     >
       {node && (
-        <button className="close-btn" onClick={onClose} aria-label="Close">
+        <motion.button
+          className="close-btn glass-btn"
+          onClick={onClose}
+          aria-label="Close"
+          whileTap={{ scale: 0.86 }}
+          transition={{ duration: 0.15 }}
+        >
           ×
-        </button>
+        </motion.button>
       )}
 
       <AnimatePresence mode="wait" initial={false}>
@@ -103,7 +109,7 @@ export function InfoPanel({ node, nodes, edges, onSelect, onClose }: InfoPanelPr
                     if (!other) return null
                     return (
                       <li key={e.source}>
-                        <button className="link-btn" onClick={() => onSelect(other.id)}>
+                        <button className="link-btn glass-btn" onClick={() => onSelect(other.id)}>
                           {other.label}
                         </button>
                         <span className="edge-kind">{EDGE_KIND_LABEL[e.kind]}</span>
@@ -124,7 +130,7 @@ export function InfoPanel({ node, nodes, edges, onSelect, onClose }: InfoPanelPr
                     return (
                       <li key={e.target}>
                         <span className="edge-kind">{EDGE_KIND_LABEL[e.kind]}</span>
-                        <button className="link-btn" onClick={() => onSelect(other.id)}>
+                        <button className="link-btn glass-btn" onClick={() => onSelect(other.id)}>
                           {other.label}
                         </button>
                       </li>

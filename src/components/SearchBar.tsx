@@ -32,7 +32,7 @@ export function SearchBar({ value, matchCount, onChange }: SearchBarProps) {
                 {matchCount} match{matchCount === 1 ? '' : 'es'}
               </span>
             )}
-            <button className="close-btn search-clear" onClick={() => onChange('')} aria-label="Clear search">
+            <button className="close-btn search-clear glass-btn" onClick={() => onChange('')} aria-label="Clear search">
               ×
             </button>
           </motion.div>

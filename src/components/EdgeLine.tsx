@@ -13,16 +13,18 @@ interface EdgeLineProps {
   to: PositionedNode
   isHighlighted: boolean
   isDimmed: boolean
+  autoRotate: boolean
 }
 
 // Same damping rate as NodeMesh, so edges and their endpoints fade in step.
 const SMOOTH_LAMBDA = 10
 
-export function EdgeLine({ edge, from, to, isHighlighted, isDimmed }: EdgeLineProps) {
+export function EdgeLine({ edge, from, to, isHighlighted, isDimmed, autoRotate }: EdgeLineProps) {
   const flowRef = useRef<THREE.Sprite>(null)
   const lineRef = useRef<Line2>(null)
   const texture = useMemo(() => getGlowTexture(), [])
   const speedPhase = useMemo(() => hashToUnit(`${edge.source}->${edge.target}`), [edge.source, edge.target])
+  const flowProgress = useRef(speedPhase)
 
   const curve = useMemo(() => {
     const start = new THREE.Vector3(from.x, from.y, from.z)
@@ -57,7 +59,7 @@ export function EdgeLine({ edge, from, to, isHighlighted, isDimmed }: EdgeLinePr
     flowScale: targetFlowScale,
   })
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     const s = smoothed.current
     s.opacity = THREE.MathUtils.damp(s.opacity, targetOpacity, SMOOTH_LAMBDA, delta)
     s.lineWidth = THREE.MathUtils.damp(s.lineWidth, targetLineWidth, SMOOTH_LAMBDA, delta)
@@ -71,9 +73,11 @@ export function EdgeLine({ edge, from, to, isHighlighted, isDimmed }: EdgeLinePr
     }
 
     if (flowRef.current) {
-      const speed = 0.15 + speedPhase * 0.1
-      const t = (state.clock.elapsedTime * speed + speedPhase) % 1
-      const point = curve.getPoint(t)
+      if (autoRotate) {
+        const speed = 0.15 + speedPhase * 0.1
+        flowProgress.current = (flowProgress.current + delta * speed) % 1
+      }
+      const point = curve.getPoint(flowProgress.current)
       flowRef.current.position.copy(point)
       flowRef.current.scale.setScalar(s.flowScale)
       ;(flowRef.current.material as THREE.SpriteMaterial).opacity = s.flowOpacity

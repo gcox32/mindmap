@@ -27,13 +27,15 @@ export function Legend({ statusLine }: LegendProps) {
     <motion.div layout transition={{ duration: 0.3, ease: 'easeInOut' }} className="panel legend">
       <div className="legend-header">
         <div className="legend-status">{statusLine}</div>
-        <button
-          className="legend-toggle"
+        <motion.button
+          className="legend-toggle glass-btn"
           onClick={() => setCollapsed((v) => !v)}
           aria-label={collapsed ? 'Expand legend' : 'Collapse legend'}
+          whileTap={{ scale: 0.86 }}
+          transition={{ duration: 0.15 }}
         >
           {collapsed ? '▸' : '▾'}
-        </button>
+        </motion.button>
       </div>
 
       <AnimatePresence initial={false}>

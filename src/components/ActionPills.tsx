@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import type { FocusMode } from '../graph/traversal'
 
 interface ActionPillsProps {
@@ -24,13 +25,33 @@ export function ActionPills({ nodeLabel, focusMode, onSetFocusMode, onClose }: A
             className={`pill-btn ${focusMode === mode ? 'pill-btn--active' : ''}`}
             onClick={() => onSetFocusMode(mode)}
           >
-            {label}
+            {focusMode === mode && (
+              <motion.div
+                className="pill-thumb"
+                layoutId="pill-thumb"
+                transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+              >
+                <motion.div
+                  key={focusMode}
+                  className="pill-thumb-fill"
+                  initial={{ scaleX: 1.18 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
+                />
+              </motion.div>
+            )}
+            <span className="pill-btn-label">{label}</span>
           </button>
         ))}
       </div>
-      <button className="pill-btn pill-btn--close" onClick={onClose}>
+      <motion.button
+        className="pill-btn pill-btn--close glass-btn"
+        onClick={onClose}
+        whileTap={{ scale: 0.86 }}
+        transition={{ duration: 0.15 }}
+      >
         Clear
-      </button>
+      </motion.button>
     </div>
   )
 }

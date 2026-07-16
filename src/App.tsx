@@ -6,6 +6,7 @@ import { Legend } from './components/Legend'
 import { TopBar } from './components/TopBar'
 import { SearchBar } from './components/SearchBar'
 import { ActionPills } from './components/ActionPills'
+import { LiquidGlassDefs } from './components/LiquidGlassDefs'
 import { nodes, edges } from './data/dummyData'
 import type { FocusMode } from './graph/traversal'
 
@@ -39,6 +40,7 @@ function App() {
 
   return (
     <div className="app">
+      <LiquidGlassDefs />
       <Scene
         nodes={nodes}
         edges={edges}

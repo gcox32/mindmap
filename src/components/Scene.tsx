@@ -61,6 +61,7 @@ export function Scene({
           hoveredId={hoveredId}
           onHover={onHover}
           onSelect={onSelect}
+          autoRotate={autoRotate}
           focusMode={focusMode}
           searchMatchIds={searchMatchIds}
           controlsRef={controlsRef}
