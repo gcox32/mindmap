@@ -58,7 +58,9 @@ export function Scene({
       <CameraReset resetSignal={resetSignal} controlsRef={controlsRef} />
 
       <Suspense fallback={null}>
-        <Stars radius={420} depth={100} count={1000} factor={1.8} saturation={0} fade speed={0.25} />
+        {settings.showStars && (
+          <Stars radius={420} depth={100} count={1000} factor={1.8} saturation={0} fade speed={0.25} />
+        )}
         <Graph
           nodes={nodes}
           edges={edges}

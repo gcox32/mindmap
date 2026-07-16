@@ -61,6 +61,18 @@ export function SettingsPopover({ settings, onChange }: SettingsPopoverProps) {
                 <span className="settings-switch-thumb" />
               </span>
             </label>
+            <label className="settings-row">
+              <span>Star field</span>
+              <span className="settings-switch">
+                <input
+                  type="checkbox"
+                  checked={settings.showStars}
+                  onChange={(e) => onChange({ ...settings, showStars: e.target.checked })}
+                />
+                <span className="settings-switch-track" />
+                <span className="settings-switch-thumb" />
+              </span>
+            </label>
           </motion.div>
         )}
       </AnimatePresence>
