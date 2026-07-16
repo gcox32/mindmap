@@ -52,6 +52,8 @@ function App() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         handleSelect(null)
+        setSearchQuery('')
+        searchInputRef.current?.blur()
         return
       }
 

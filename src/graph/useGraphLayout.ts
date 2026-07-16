@@ -10,6 +10,17 @@ import { getNodeRadius } from './style'
 const COLLIDE_SCALE = 1.8
 const COLLIDE_PADDING = 6
 
+// Nucleus-type nodes get much stronger repulsion than everything else so
+// secondary servers hold their own presence and push their satellites into
+// a distinct sub-cluster, even though (unlike the primary) they aren't
+// pinned and are free to drift as the layout settles.
+const CHARGE_STRENGTH_BY_TYPE: Record<GraphNode['type'], number> = {
+  nucleus: -520,
+  source: -140,
+  process: -140,
+  output: -140,
+}
+
 const LINK_DISTANCE_BY_KIND: Record<GraphEdge['kind'], number> = {
   feeds: 34,
   spawns: 20,
@@ -26,7 +37,10 @@ export function computeLayout(nodes: GraphNode[], edges: GraphEdge[]): Positione
   const simLinks: SimLink[] = edges.map((e) => ({ source: e.source, target: e.target, kind: e.kind }))
 
   const simulation = forceSimulation<SimNode>(simNodes, 3)
-    .force('charge', forceManyBody().strength(-140))
+    .force(
+      'charge',
+      forceManyBody().strength((d) => CHARGE_STRENGTH_BY_TYPE[(d as SimNode).type]),
+    )
     .force(
       'link',
       forceLink<SimNode, SimLink>(simLinks)
@@ -41,11 +55,16 @@ export function computeLayout(nodes: GraphNode[], edges: GraphEdge[]): Positione
     )
     .stop()
 
-  const nucleus = simNodes.find((n) => n.type === 'nucleus')
-  if (nucleus) {
-    nucleus.fx = 0
-    nucleus.fy = 0
-    nucleus.fz = 0
+  // Only the *first* nucleus (the primary/central server, by data ordering)
+  // gets pinned to the world origin — it's the camera's fixed anchor. Any
+  // further nucleus-typed nodes (secondary, near-self-contained servers)
+  // are intentionally left unpinned; their elevated charge above holds them
+  // apart as their own sub-cluster, but they drift with layout changes.
+  const primaryNucleus = simNodes.find((n) => n.type === 'nucleus')
+  if (primaryNucleus) {
+    primaryNucleus.fx = 0
+    primaryNucleus.fy = 0
+    primaryNucleus.fz = 0
   }
 
   const ITERATIONS = 400

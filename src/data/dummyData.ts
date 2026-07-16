@@ -30,6 +30,12 @@ export const nodes: GraphNode[] = [
   { id: 'slack-alerts', type: 'output', subtype: 'slack', label: 'Slack Risk Alerts', description: 'Real-time alert messages posted to #risk-alerts.' },
   { id: 'pdf-report', type: 'output', subtype: 'pdf', label: 'PDF Investor Report', description: 'Formatted PDF distributed to investors.' },
   { id: 's3-archive', type: 'output', subtype: 'archive', label: 'S3 Archive', description: 'Long-term cold storage of normalized price history.' },
+
+  // --- Secondary server: APAC desk (near-self-contained regional node) ---
+  { id: 'apac-nucleus', type: 'nucleus', label: 'APAC Desk', description: 'Secondary regional server — mirrors the core pipeline for APAC markets, mostly self-contained.' },
+  { id: 'apac-feed', type: 'source', subtype: 'api', label: 'SGX Feed', description: 'Real-time market data feed for APAC exchanges.' },
+  { id: 'apac-risk', type: 'process', subtype: 'cron-script', label: 'apac_risk.py', schedule: '0 * * * *', description: 'Hourly regional VaR computation, mirrors risk_model.py.' },
+  { id: 'apac-report', type: 'output', subtype: 'pdf', label: 'APAC PDF Report', description: 'Formatted regional report distributed to APAC stakeholders.' },
 ]
 
 export const edges: GraphEdge[] = [
@@ -73,4 +79,12 @@ export const edges: GraphEdge[] = [
 
   // feedback loop: an output becomes a source for another process
   { source: 'sql-positions', target: 'risk-model', kind: 'cycles', volume: 2 },
+
+  // secondary server ties lightly back to the central nucleus
+  { source: 'nucleus', target: 'apac-nucleus', kind: 'feeds', volume: 1 },
+
+  // APAC desk's own near-self-contained pipeline
+  { source: 'apac-nucleus', target: 'apac-feed', kind: 'feeds', volume: 2 },
+  { source: 'apac-feed', target: 'apac-risk', kind: 'feeds', volume: 8 },
+  { source: 'apac-risk', target: 'apac-report', kind: 'produces', volume: 2 },
 ]

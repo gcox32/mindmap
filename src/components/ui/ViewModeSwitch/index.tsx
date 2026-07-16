@@ -9,7 +9,7 @@ interface ViewModeSwitchProps {
 }
 
 const MODES: Array<{ value: ViewMode; label: string }> = [
-  { value: 'overview', label: 'Overview' },
+  { value: 'overview', label: 'View' },
   { value: 'explore', label: 'Explore' },
 ]
 

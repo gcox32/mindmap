@@ -10,12 +10,18 @@ interface RingSpec {
   speed: number
 }
 
+// Ring radii/tubes are tuned for a nucleus at REFERENCE_RADIUS; actual
+// instances scale proportionally to the radius of the nucleus they orbit,
+// so secondary (usually same-sized, but not guaranteed) nuclei get
+// correctly proportioned rings too.
+const REFERENCE_RADIUS = 8
+
 const RINGS: RingSpec[] = [
   { radius: 150, tube: 0.25, tilt: [Math.PI / 2.4, 0, 0], opacity: 0.14, speed: 0.02 },
   { radius: 195, tube: 0.18, tilt: [Math.PI / 1.8, 0.4, 0], opacity: 0.08, speed: -0.015 },
 ]
 
-function Ring({ spec }: { spec: RingSpec }) {
+function Ring({ spec, scaleFactor }: { spec: RingSpec; scaleFactor: number }) {
   const ref = useRef<THREE.Mesh>(null)
 
   useFrame((_, delta) => {
@@ -24,7 +30,7 @@ function Ring({ spec }: { spec: RingSpec }) {
 
   return (
     <mesh ref={ref} rotation={spec.tilt}>
-      <torusGeometry args={[spec.radius, spec.tube, 8, 128]} />
+      <torusGeometry args={[spec.radius * scaleFactor, spec.tube * scaleFactor, 8, 128]} />
       <meshBasicMaterial
         color="#8fb8ff"
         transparent
@@ -36,12 +42,19 @@ function Ring({ spec }: { spec: RingSpec }) {
   )
 }
 
-/** Faint tilted orbital rings around the nucleus — an atmospheric halo, purely decorative. */
-export function OrbitHalo() {
+interface OrbitHaloProps {
+  position: [number, number, number]
+  radius: number
+}
+
+/** Faint tilted orbital rings around a nucleus — an atmospheric halo, purely decorative. */
+export function OrbitHalo({ position, radius }: OrbitHaloProps) {
+  const scaleFactor = radius / REFERENCE_RADIUS
+
   return (
-    <group>
+    <group position={position}>
       {RINGS.map((spec, i) => (
-        <Ring key={i} spec={spec} />
+        <Ring key={i} spec={spec} scaleFactor={scaleFactor} />
       ))}
     </group>
   )

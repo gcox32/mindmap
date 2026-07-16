@@ -7,7 +7,6 @@ import type { GraphEdge, GraphNode } from '@/data/types'
 import type { FocusMode } from '@/graph/traversal'
 import type { ViewMode } from '@/components/ui/ViewModeSwitch'
 import { Graph } from './Graph'
-import { OrbitHalo } from './OrbitHalo'
 import { CameraReset } from './CameraReset'
 import { BACKGROUND_COLOR } from '@/graph/style'
 
@@ -57,7 +56,6 @@ export function Scene({
 
       <Suspense fallback={null}>
         <Stars radius={420} depth={100} count={1000} factor={1.8} saturation={0} fade speed={0.25} />
-        <OrbitHalo />
         <Graph
           nodes={nodes}
           edges={edges}

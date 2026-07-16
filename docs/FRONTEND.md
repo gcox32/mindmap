@@ -73,7 +73,16 @@ in 3D primitives, not DOM.
 - `CameraReset.tsx` — animates the camera back to its default framing
   whenever `resetSignal` increments (bumped by the reset-view hotkey/button
   in `App.tsx`).
-- `OrbitHalo.tsx` — the decorative ring animation independent of any node.
+- `OrbitHalo.tsx` — the decorative ring animation independent of any node. (implement using the following)
+```
+      {positioned
+        .filter((node) => node.type === 'nucleus')
+        .map((node) => (
+          <OrbitHalo key={`halo-${node.id}`} position={[node.x, node.y, node.z]} radius={getNodeRadius(node)} />
+        ))}
+```
+
+
 
 ## UI components (`src/components/ui/`)
 
