@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Pause, Play, TimerReset } from 'lucide-react';
-import { SettingsPopover, type SceneSettings } from '@/components/explore/SettingsPopover'
+import { SettingsPopover } from '@/components/explore/SettingsPopover'
+import type { SceneSettings } from '@/components/explore/SettingsPopover/constants'
 import './TopBar.css'
 
 interface TopBarProps {
