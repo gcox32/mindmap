@@ -38,7 +38,7 @@ export const nodes: GraphNode[] = [
   { id: 'apac-report', type: 'output', subtype: 'pdf', label: 'APAC PDF Report', description: 'Formatted regional report distributed to APAC stakeholders.' },
 ]
 
-export const edges: GraphEdge[] = [
+const edgeDefs: Array<Omit<GraphEdge, 'id'>> = [
   // nucleus ties the three domains together — structural, not a real data flow
   { source: 'nucleus', target: 'bloomberg', kind: 'feeds', volume: 2 },
   { source: 'nucleus', target: 'internal-db', kind: 'feeds', volume: 2 },
@@ -88,3 +88,5 @@ export const edges: GraphEdge[] = [
   { source: 'apac-feed', target: 'apac-risk', kind: 'feeds', volume: 8 },
   { source: 'apac-risk', target: 'apac-report', kind: 'produces', volume: 2 },
 ]
+
+export const edges: GraphEdge[] = edgeDefs.map((e, i) => ({ id: `e${i + 1}`, ...e }))

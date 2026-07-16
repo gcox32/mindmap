@@ -10,7 +10,7 @@ import (
 )
 
 const createEdge = `-- name: CreateEdge :one
-INSERT INTO edges (id, source, target, kind, volume)
+INSERT INTO mindmap.edges (id, source, target, kind, volume)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING id, source, target, kind, volume
 `
@@ -23,7 +23,7 @@ type CreateEdgeParams struct {
 	Volume int32  `json:"volume"`
 }
 
-func (q *Queries) CreateEdge(ctx context.Context, arg CreateEdgeParams) (Edge, error) {
+func (q *Queries) CreateEdge(ctx context.Context, arg CreateEdgeParams) (MindmapEdge, error) {
 	row := q.db.QueryRow(ctx, createEdge,
 		arg.ID,
 		arg.Source,
@@ -31,7 +31,7 @@ func (q *Queries) CreateEdge(ctx context.Context, arg CreateEdgeParams) (Edge, e
 		arg.Kind,
 		arg.Volume,
 	)
-	var i Edge
+	var i MindmapEdge
 	err := row.Scan(
 		&i.ID,
 		&i.Source,
@@ -43,7 +43,7 @@ func (q *Queries) CreateEdge(ctx context.Context, arg CreateEdgeParams) (Edge, e
 }
 
 const createNode = `-- name: CreateNode :one
-INSERT INTO nodes (id, type, subtype, label, description, schedule)
+INSERT INTO mindmap.nodes (id, type, subtype, label, description, schedule)
 VALUES (
     $1,
     $2,
@@ -64,7 +64,7 @@ type CreateNodeParams struct {
 	Schedule    *string `json:"schedule"`
 }
 
-func (q *Queries) CreateNode(ctx context.Context, arg CreateNodeParams) (Node, error) {
+func (q *Queries) CreateNode(ctx context.Context, arg CreateNodeParams) (MindmapNode, error) {
 	row := q.db.QueryRow(ctx, createNode,
 		arg.ID,
 		arg.Type,
@@ -73,7 +73,7 @@ func (q *Queries) CreateNode(ctx context.Context, arg CreateNodeParams) (Node, e
 		arg.Description,
 		arg.Schedule,
 	)
-	var i Node
+	var i MindmapNode
 	err := row.Scan(
 		&i.ID,
 		&i.Type,
@@ -86,7 +86,7 @@ func (q *Queries) CreateNode(ctx context.Context, arg CreateNodeParams) (Node, e
 }
 
 const deleteEdge = `-- name: DeleteEdge :exec
-DELETE FROM edges WHERE id = $1
+DELETE FROM mindmap.edges WHERE id = $1
 `
 
 func (q *Queries) DeleteEdge(ctx context.Context, id string) error {
@@ -95,7 +95,7 @@ func (q *Queries) DeleteEdge(ctx context.Context, id string) error {
 }
 
 const deleteNode = `-- name: DeleteNode :exec
-DELETE FROM nodes WHERE id = $1
+DELETE FROM mindmap.nodes WHERE id = $1
 `
 
 func (q *Queries) DeleteNode(ctx context.Context, id string) error {
@@ -104,12 +104,12 @@ func (q *Queries) DeleteNode(ctx context.Context, id string) error {
 }
 
 const getEdge = `-- name: GetEdge :one
-SELECT id, source, target, kind, volume FROM edges WHERE id = $1
+SELECT id, source, target, kind, volume FROM mindmap.edges WHERE id = $1
 `
 
-func (q *Queries) GetEdge(ctx context.Context, id string) (Edge, error) {
+func (q *Queries) GetEdge(ctx context.Context, id string) (MindmapEdge, error) {
 	row := q.db.QueryRow(ctx, getEdge, id)
-	var i Edge
+	var i MindmapEdge
 	err := row.Scan(
 		&i.ID,
 		&i.Source,
@@ -121,12 +121,12 @@ func (q *Queries) GetEdge(ctx context.Context, id string) (Edge, error) {
 }
 
 const getNode = `-- name: GetNode :one
-SELECT id, type, subtype, label, description, schedule FROM nodes WHERE id = $1
+SELECT id, type, subtype, label, description, schedule FROM mindmap.nodes WHERE id = $1
 `
 
-func (q *Queries) GetNode(ctx context.Context, id string) (Node, error) {
+func (q *Queries) GetNode(ctx context.Context, id string) (MindmapNode, error) {
 	row := q.db.QueryRow(ctx, getNode, id)
-	var i Node
+	var i MindmapNode
 	err := row.Scan(
 		&i.ID,
 		&i.Type,
@@ -139,18 +139,18 @@ func (q *Queries) GetNode(ctx context.Context, id string) (Node, error) {
 }
 
 const listEdges = `-- name: ListEdges :many
-SELECT id, source, target, kind, volume FROM edges ORDER BY id
+SELECT id, source, target, kind, volume FROM mindmap.edges ORDER BY id
 `
 
-func (q *Queries) ListEdges(ctx context.Context) ([]Edge, error) {
+func (q *Queries) ListEdges(ctx context.Context) ([]MindmapEdge, error) {
 	rows, err := q.db.Query(ctx, listEdges)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Edge
+	var items []MindmapEdge
 	for rows.Next() {
-		var i Edge
+		var i MindmapEdge
 		if err := rows.Scan(
 			&i.ID,
 			&i.Source,
@@ -169,18 +169,18 @@ func (q *Queries) ListEdges(ctx context.Context) ([]Edge, error) {
 }
 
 const listNodes = `-- name: ListNodes :many
-SELECT id, type, subtype, label, description, schedule FROM nodes ORDER BY id
+SELECT id, type, subtype, label, description, schedule FROM mindmap.nodes ORDER BY id
 `
 
-func (q *Queries) ListNodes(ctx context.Context) ([]Node, error) {
+func (q *Queries) ListNodes(ctx context.Context) ([]MindmapNode, error) {
 	rows, err := q.db.Query(ctx, listNodes)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Node
+	var items []MindmapNode
 	for rows.Next() {
-		var i Node
+		var i MindmapNode
 		if err := rows.Scan(
 			&i.ID,
 			&i.Type,
@@ -200,7 +200,7 @@ func (q *Queries) ListNodes(ctx context.Context) ([]Node, error) {
 }
 
 const updateEdge = `-- name: UpdateEdge :one
-UPDATE edges
+UPDATE mindmap.edges
 SET
     source = $1,
     target = $2,
@@ -218,7 +218,7 @@ type UpdateEdgeParams struct {
 	ID     string `json:"id"`
 }
 
-func (q *Queries) UpdateEdge(ctx context.Context, arg UpdateEdgeParams) (Edge, error) {
+func (q *Queries) UpdateEdge(ctx context.Context, arg UpdateEdgeParams) (MindmapEdge, error) {
 	row := q.db.QueryRow(ctx, updateEdge,
 		arg.Source,
 		arg.Target,
@@ -226,7 +226,7 @@ func (q *Queries) UpdateEdge(ctx context.Context, arg UpdateEdgeParams) (Edge, e
 		arg.Volume,
 		arg.ID,
 	)
-	var i Edge
+	var i MindmapEdge
 	err := row.Scan(
 		&i.ID,
 		&i.Source,
@@ -238,7 +238,7 @@ func (q *Queries) UpdateEdge(ctx context.Context, arg UpdateEdgeParams) (Edge, e
 }
 
 const updateNode = `-- name: UpdateNode :one
-UPDATE nodes
+UPDATE mindmap.nodes
 SET
     type = $1,
     subtype = $2,
@@ -258,7 +258,7 @@ type UpdateNodeParams struct {
 	ID          string  `json:"id"`
 }
 
-func (q *Queries) UpdateNode(ctx context.Context, arg UpdateNodeParams) (Node, error) {
+func (q *Queries) UpdateNode(ctx context.Context, arg UpdateNodeParams) (MindmapNode, error) {
 	row := q.db.QueryRow(ctx, updateNode,
 		arg.Type,
 		arg.Subtype,
@@ -267,7 +267,7 @@ func (q *Queries) UpdateNode(ctx context.Context, arg UpdateNodeParams) (Node, e
 		arg.Schedule,
 		arg.ID,
 	)
-	var i Node
+	var i MindmapNode
 	err := row.Scan(
 		&i.ID,
 		&i.Type,

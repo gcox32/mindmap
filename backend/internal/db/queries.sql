@@ -1,11 +1,11 @@
 -- name: ListNodes :many
-SELECT * FROM nodes ORDER BY id;
+SELECT * FROM mindmap.nodes ORDER BY id;
 
 -- name: GetNode :one
-SELECT * FROM nodes WHERE id = sqlc.arg(id);
+SELECT * FROM mindmap.nodes WHERE id = sqlc.arg(id);
 
 -- name: CreateNode :one
-INSERT INTO nodes (id, type, subtype, label, description, schedule)
+INSERT INTO mindmap.nodes (id, type, subtype, label, description, schedule)
 VALUES (
     sqlc.arg(id),
     sqlc.arg(type),
@@ -17,7 +17,7 @@ VALUES (
 RETURNING *;
 
 -- name: UpdateNode :one
-UPDATE nodes
+UPDATE mindmap.nodes
 SET
     type = sqlc.arg(type),
     subtype = sqlc.narg(subtype),
@@ -28,21 +28,21 @@ WHERE id = sqlc.arg(id)
 RETURNING *;
 
 -- name: DeleteNode :exec
-DELETE FROM nodes WHERE id = sqlc.arg(id);
+DELETE FROM mindmap.nodes WHERE id = sqlc.arg(id);
 
 -- name: ListEdges :many
-SELECT * FROM edges ORDER BY id;
+SELECT * FROM mindmap.edges ORDER BY id;
 
 -- name: GetEdge :one
-SELECT * FROM edges WHERE id = sqlc.arg(id);
+SELECT * FROM mindmap.edges WHERE id = sqlc.arg(id);
 
 -- name: CreateEdge :one
-INSERT INTO edges (id, source, target, kind, volume)
+INSERT INTO mindmap.edges (id, source, target, kind, volume)
 VALUES (sqlc.arg(id), sqlc.arg(source), sqlc.arg(target), sqlc.arg(kind), sqlc.arg(volume))
 RETURNING *;
 
 -- name: UpdateEdge :one
-UPDATE edges
+UPDATE mindmap.edges
 SET
     source = sqlc.arg(source),
     target = sqlc.arg(target),
@@ -52,4 +52,4 @@ WHERE id = sqlc.arg(id)
 RETURNING *;
 
 -- name: DeleteEdge :exec
-DELETE FROM edges WHERE id = sqlc.arg(id);
+DELETE FROM mindmap.edges WHERE id = sqlc.arg(id);

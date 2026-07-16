@@ -1,7 +1,7 @@
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import './ViewModeSwitch.css'
 
-export type ViewMode = 'overview' | 'explore'
+export type ViewMode = 'overview' | 'explore' | 'manage'
 
 interface ViewModeSwitchProps {
   viewMode: ViewMode
@@ -11,6 +11,7 @@ interface ViewModeSwitchProps {
 const MODES: Array<{ value: ViewMode; label: string }> = [
   { value: 'overview', label: 'View' },
   { value: 'explore', label: 'Explore' },
+  { value: 'manage', label: 'Manage' },
 ]
 
 export function ViewModeSwitch({ viewMode, onChange }: ViewModeSwitchProps) {

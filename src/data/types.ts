@@ -29,6 +29,7 @@ export interface GraphNode {
 export type EdgeKind = 'feeds' | 'spawns' | 'produces' | 'cycles'
 
 export interface GraphEdge {
+  id: string
   source: string
   target: string
   kind: EdgeKind

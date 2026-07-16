@@ -9,16 +9,16 @@ import (
 )
 
 type Querier interface {
-	CreateEdge(ctx context.Context, arg CreateEdgeParams) (Edge, error)
-	CreateNode(ctx context.Context, arg CreateNodeParams) (Node, error)
+	CreateEdge(ctx context.Context, arg CreateEdgeParams) (MindmapEdge, error)
+	CreateNode(ctx context.Context, arg CreateNodeParams) (MindmapNode, error)
 	DeleteEdge(ctx context.Context, id string) error
 	DeleteNode(ctx context.Context, id string) error
-	GetEdge(ctx context.Context, id string) (Edge, error)
-	GetNode(ctx context.Context, id string) (Node, error)
-	ListEdges(ctx context.Context) ([]Edge, error)
-	ListNodes(ctx context.Context) ([]Node, error)
-	UpdateEdge(ctx context.Context, arg UpdateEdgeParams) (Edge, error)
-	UpdateNode(ctx context.Context, arg UpdateNodeParams) (Node, error)
+	GetEdge(ctx context.Context, id string) (MindmapEdge, error)
+	GetNode(ctx context.Context, id string) (MindmapNode, error)
+	ListEdges(ctx context.Context) ([]MindmapEdge, error)
+	ListNodes(ctx context.Context) ([]MindmapNode, error)
+	UpdateEdge(ctx context.Context, arg UpdateEdgeParams) (MindmapEdge, error)
+	UpdateNode(ctx context.Context, arg UpdateNodeParams) (MindmapNode, error)
 }
 
 var _ Querier = (*Queries)(nil)

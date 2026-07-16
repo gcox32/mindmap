@@ -11,10 +11,24 @@ import { LiquidGlassDefs } from '@/components/ui/LiquidGlassDefs'
 import { ViewModeSwitch, type ViewMode } from '@/components/ui/ViewModeSwitch'
 import { DEFAULT_SCENE_SETTINGS, type SceneSettings } from '@/components/explore/SettingsPopover/constants'
 import { OverviewOverlay } from '@/components/overview/OverviewOverlay'
-import { nodes, edges } from '@/data/dummyData'
+import { ManageOverlay } from '@/components/manage/ManageOverlay'
+import { useGraphData } from '@/data/useGraphData'
 import type { FocusMode } from '@/graph/traversal'
 
 function App() {
+  const {
+    nodes,
+    edges,
+    loading,
+    error,
+    reload,
+    createNode,
+    updateNode,
+    deleteNode,
+    createEdge,
+    updateEdge,
+    deleteEdge,
+  } = useGraphData()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [autoRotate, setAutoRotate] = useState(true)
@@ -32,7 +46,7 @@ function App() {
     const q = searchQuery.trim().toLowerCase()
     if (!q) return null
     return new Set(nodes.filter((n) => n.label.toLowerCase().includes(q)).map((n) => n.id))
-  }, [searchQuery])
+  }, [searchQuery, nodes])
 
   const handleSelect = (id: string | null) => {
     setSelectedId(id)
@@ -77,6 +91,9 @@ function App() {
       } else if (e.key.toLowerCase() === 'e') {
         e.preventDefault()
         handleSetViewMode('explore')
+      } else if (e.key.toLowerCase() === 'm') {
+        e.preventDefault()
+        handleSetViewMode('manage')
       }
     }
 
@@ -91,6 +108,27 @@ function App() {
       : `Legend`
 
   const isExplore = viewMode === 'explore'
+
+  if (loading) {
+    return (
+      <div className="app status-screen">
+        <div className="panel status-panel">Loading graph…</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="app status-screen">
+        <div className="panel status-panel">
+          <span>Failed to load graph: {error}</span>
+          <button className="primary-btn" onClick={reload}>
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="app">
@@ -171,6 +209,18 @@ function App() {
               </motion.div>
             </div>
           </motion.div>
+        ) : viewMode === 'manage' ? (
+          <ManageOverlay
+            key="manage-chrome"
+            nodes={nodes}
+            edges={edges}
+            onCreateNode={createNode}
+            onUpdateNode={updateNode}
+            onDeleteNode={deleteNode}
+            onCreateEdge={createEdge}
+            onUpdateEdge={updateEdge}
+            onDeleteEdge={deleteEdge}
+          />
         ) : (
           <OverviewOverlay key="overview-chrome" nodes={nodes} edges={edges} />
         )}

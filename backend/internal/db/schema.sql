@@ -1,4 +1,6 @@
-CREATE TABLE IF NOT EXISTS nodes (
+CREATE SCHEMA IF NOT EXISTS mindmap;
+
+CREATE TABLE IF NOT EXISTS mindmap.nodes (
     id TEXT PRIMARY KEY,
     type TEXT NOT NULL,
     subtype TEXT,
@@ -7,10 +9,10 @@ CREATE TABLE IF NOT EXISTS nodes (
     schedule TEXT
 );
 
-CREATE TABLE IF NOT EXISTS edges (
+CREATE TABLE IF NOT EXISTS mindmap.edges (
     id TEXT PRIMARY KEY,
-    source TEXT NOT NULL REFERENCES nodes (id) ON DELETE CASCADE,
-    target TEXT NOT NULL REFERENCES nodes (id) ON DELETE CASCADE,
+    source TEXT NOT NULL REFERENCES mindmap.nodes (id) ON DELETE CASCADE,
+    target TEXT NOT NULL REFERENCES mindmap.nodes (id) ON DELETE CASCADE,
     kind TEXT NOT NULL,
     volume INTEGER NOT NULL
 );

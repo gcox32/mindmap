@@ -23,7 +23,7 @@ export function EdgeLine({ edge, from, to, isHighlighted, isDimmed, autoRotate }
   const flowRef = useRef<THREE.Sprite>(null)
   const lineRef = useRef<Line2>(null)
   const texture = useMemo(() => getGlowTexture(), [])
-  const speedPhase = useMemo(() => hashToUnit(`${edge.source}->${edge.target}`), [edge.source, edge.target])
+  const speedPhase = useMemo(() => hashToUnit(edge.id), [edge.id])
   const flowProgress = useRef(speedPhase)
 
   const curve = useMemo(() => {
@@ -37,11 +37,11 @@ export function EdgeLine({ edge, from, to, isHighlighted, isDimmed, autoRotate }
     const len = dir.length() || 1
     const arbitrary = Math.abs(dir.y) < len * 0.9 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0)
     const perp = new THREE.Vector3().crossVectors(dir, arbitrary).normalize()
-    const bow = (hashToUnit(edge.source + edge.target) - 0.5) * len * 0.35
+    const bow = (hashToUnit(edge.id) - 0.5) * len * 0.35
     mid.add(perp.multiplyScalar(bow))
 
     return new THREE.QuadraticBezierCurve3(start, mid, end)
-  }, [from.x, from.y, from.z, to.x, to.y, to.z, edge.source, edge.target])
+  }, [from.x, from.y, from.z, to.x, to.y, to.z, edge.id])
 
   const points = useMemo(() => curve.getPoints(24), [curve])
   const color = EDGE_COLOR[edge.kind]

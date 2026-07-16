@@ -23,6 +23,9 @@ func (s *Server) listEdges(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	if edges == nil {
+		edges = []db.MindmapEdge{}
+	}
 	writeJSON(w, http.StatusOK, edges)
 }
 

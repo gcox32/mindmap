@@ -111,7 +111,7 @@ export function InfoPanel({ node, nodes, edges, onSelect, onClose }: InfoPanelPr
                     const other = nodeById.get(e.source)
                     if (!other) return null
                     return (
-                      <li key={e.source}>
+                      <li key={e.id}>
                         <button className="link-btn glass-btn" onClick={() => onSelect(other.id)}>
                           {other.label}
                         </button>
@@ -131,7 +131,7 @@ export function InfoPanel({ node, nodes, edges, onSelect, onClose }: InfoPanelPr
                     const other = nodeById.get(e.target)
                     if (!other) return null
                     return (
-                      <li key={e.target}>
+                      <li key={e.id}>
                         <span className="edge-kind">{EDGE_KIND_LABEL[e.kind]}</span>
                         <button className="link-btn glass-btn" onClick={() => onSelect(other.id)}>
                           {other.label}

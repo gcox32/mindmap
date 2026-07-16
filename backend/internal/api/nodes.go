@@ -24,6 +24,9 @@ func (s *Server) listNodes(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	if nodes == nil {
+		nodes = []db.MindmapNode{}
+	}
 	writeJSON(w, http.StatusOK, nodes)
 }
 

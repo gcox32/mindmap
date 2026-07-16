@@ -4,7 +4,7 @@
 
 package db
 
-type Edge struct {
+type MindmapEdge struct {
 	ID     string `json:"id"`
 	Source string `json:"source"`
 	Target string `json:"target"`
@@ -12,7 +12,7 @@ type Edge struct {
 	Volume int32  `json:"volume"`
 }
 
-type Node struct {
+type MindmapNode struct {
 	ID          string  `json:"id"`
 	Type        string  `json:"type"`
 	Subtype     *string `json:"subtype"`

@@ -76,7 +76,7 @@ export function Graph({
         const isDimmed = !!highlightIds && !isHighlighted
         return (
           <EdgeLine
-            key={`${edge.source}->${edge.target}`}
+            key={edge.id}
             edge={edge}
             from={from}
             to={to}
