@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
-import { useCancelOnUserInput } from '../../graph/useCancelOnUserInput'
+import { useCancelOnUserInput } from '@/graph/useCancelOnUserInput'
 
 interface CameraResetProps {
   /** Bump this (e.g. an incrementing counter) to trigger a fresh reset flight. */

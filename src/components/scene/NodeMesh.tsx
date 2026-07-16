@@ -2,9 +2,9 @@ import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Billboard, Text } from '@react-three/drei'
 import * as THREE from 'three'
-import type { PositionedNode } from '../../data/types'
-import { NODE_COLOR, getNodeRadius, hashToUnit } from '../../graph/style'
-import { getGlowTexture } from '../../graph/textures'
+import type { PositionedNode } from '@/data/types'
+import { NODE_COLOR, getNodeRadius, hashToUnit } from '@/graph/style'
+import { getGlowTexture } from '@/graph/textures'
 
 interface NodeMeshProps {
   node: PositionedNode

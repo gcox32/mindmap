@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import type { GraphNode, NodeType } from '../../data/types'
-import { NODE_COLOR } from '../../graph/style'
+import type { GraphNode, NodeType } from '@/data/types'
+import { NODE_COLOR } from '@/graph/style'
 import './OverviewBreakdown.css'
 
 interface OverviewBreakdownProps {

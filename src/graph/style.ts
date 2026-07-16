@@ -1,4 +1,4 @@
-import type { EdgeKind, NodeSubtype, NodeType } from '../data/types'
+import type { EdgeKind, NodeSubtype, NodeType } from '@/data/types'
 
 // Deep-blue palette anchored on #2C3855 — hue stays constant, only
 // lightness/saturation shift to distinguish node types (nucleus brightest,

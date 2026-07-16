@@ -1,4 +1,4 @@
-import type { ActivityEntry } from '../../data/overviewData'
+import type { ActivityEntry } from '@/data/overviewData'
 import './OverviewActivity.css'
 
 interface OverviewActivityProps {

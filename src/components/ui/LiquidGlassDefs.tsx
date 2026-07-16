@@ -1,4 +1,4 @@
-import { LIQUID_GLASS_DISPLACEMENT_MAP } from '../../assets/liquidGlassDisplacement'
+import { LIQUID_GLASS_DISPLACEMENT_MAP } from '@/assets/liquidGlassDisplacement'
 
 export function LiquidGlassDefs() {
   return (

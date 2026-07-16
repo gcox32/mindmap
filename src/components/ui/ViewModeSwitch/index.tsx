@@ -1,4 +1,4 @@
-import { SegmentedControl } from './SegmentedControl'
+import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import './ViewModeSwitch.css'
 
 export type ViewMode = 'overview' | 'explore'

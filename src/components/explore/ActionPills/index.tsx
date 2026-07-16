@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
-import type { FocusMode } from '../../graph/traversal'
-import { SegmentedControl } from './SegmentedControl'
+import type { FocusMode } from '@/graph/traversal'
+import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import './ActionPills.css'
 
 interface ActionPillsProps {

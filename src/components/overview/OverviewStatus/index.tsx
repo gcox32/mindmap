@@ -1,4 +1,4 @@
-import type { systemStatus as SystemStatus } from '../../data/overviewData'
+import type { systemStatus as SystemStatus } from '@/data/overviewData'
 import './OverviewStatus.css'
 
 interface OverviewStatusProps {

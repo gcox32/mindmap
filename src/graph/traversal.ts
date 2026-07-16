@@ -1,4 +1,4 @@
-import type { GraphEdge } from '../data/types'
+import type { GraphEdge } from '@/data/types'
 
 export type FocusMode = 'neighbors' | 'upstream' | 'downstream'
 

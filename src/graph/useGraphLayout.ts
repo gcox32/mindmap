@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { forceSimulation, forceManyBody, forceLink, forceCenter, forceCollide } from 'd3-force-3d'
 import type { SimulationNodeDatum3D, SimulationLinkDatum3D } from 'd3-force-3d'
-import type { GraphNode, GraphEdge, PositionedNode } from '../data/types'
+import type { GraphNode, GraphEdge, PositionedNode } from '@/data/types'
 import { getNodeRadius } from './style'
 
 // Collision radius scales off the same render radius as NodeMesh (roughly

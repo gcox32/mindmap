@@ -1,9 +1,15 @@
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   build: {
     // three.js/r3f/drei/postprocessing are inherently large; split them into
     // their own vendor chunk so app code stays small and the vendor chunk
