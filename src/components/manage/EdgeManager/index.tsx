@@ -1,7 +1,12 @@
 import { useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Pencil, Trash2, Plus, X } from 'lucide-react'
 import type { EdgeKind, GraphEdge, GraphNode } from '@/data/types'
 import { EDGE_COLOR } from '@/graph/style'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
+
+const TAP_TRANSITION = { duration: 0.15 }
+const SPRING_GENTLE = { type: 'spring', stiffness: 300, damping: 28 } as const
 
 interface EdgeManagerProps {
   nodes: GraphNode[]
@@ -11,7 +16,7 @@ interface EdgeManagerProps {
   onDelete: (id: string) => Promise<void>
 }
 
-const EDGE_KINDS: EdgeKind[] = ['feeds', 'spawns', 'produces', 'cycles']
+const EDGE_KINDS: EdgeKind[] = ['feeds', 'spawns', 'produces', 'cycles', 'hosts']
 
 type FormState = {
   id: string
@@ -44,6 +49,7 @@ export function EdgeManager({ nodes, edges, onCreate, onUpdate, onDelete }: Edge
   const [form, setForm] = useState<FormState | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<GraphEdge | null>(null)
 
   const nodeById = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes])
 
@@ -65,8 +71,9 @@ export function EdgeManager({ nodes, edges, onCreate, onUpdate, onDelete }: Edge
     setError(null)
   }
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Delete this edge?')) return
+  const confirmDelete = async () => {
+    if (!deleteTarget) return
+    const id = deleteTarget.id
     setBusy(true)
     setError(null)
     try {
@@ -76,6 +83,7 @@ export function EdgeManager({ nodes, edges, onCreate, onUpdate, onDelete }: Edge
       setError(err instanceof Error ? err.message : String(err))
     } finally {
       setBusy(false)
+      setDeleteTarget(null)
     }
   }
 
@@ -107,9 +115,16 @@ export function EdgeManager({ nodes, edges, onCreate, onUpdate, onDelete }: Edge
     <>
       <div className="manage-panel-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h3 className="manage-panel-title">Edges</h3>
-        <button className="icon-btn glass-btn" onClick={startCreate} aria-label="New edge" disabled={nodes.length === 0}>
+        <motion.button
+          className="icon-btn glass-btn"
+          onClick={startCreate}
+          aria-label="New edge"
+          disabled={nodes.length === 0}
+          whileTap={{ scale: 0.86 }}
+          transition={TAP_TRANSITION}
+        >
           <Plus size={16} />
-        </button>
+        </motion.button>
       </div>
 
       <div className="manage-list">
@@ -131,7 +146,7 @@ export function EdgeManager({ nodes, edges, onCreate, onUpdate, onDelete }: Edge
                 </button>
                 <button
                   className="icon-btn icon-btn--danger"
-                  onClick={() => handleDelete(edge.id)}
+                  onClick={() => setDeleteTarget(edge)}
                   aria-label="Delete edge"
                   disabled={busy}
                 >
@@ -143,77 +158,97 @@ export function EdgeManager({ nodes, edges, onCreate, onUpdate, onDelete }: Edge
         })}
       </div>
 
-      {form && (
-        <form className="manage-form" onSubmit={handleSubmit}>
-          <label className="field">
-            id
-            <input
-              value={form.id}
-              disabled={!!editingId}
-              onChange={(e) => setForm({ ...form, id: e.target.value })}
-              placeholder="unique-slug"
-            />
-          </label>
+      <AnimatePresence initial={false}>
+        {form && (
+          <motion.div
+            key="edge-form"
+            className="manage-form-collapse"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={SPRING_GENTLE}
+          >
+            <form className="manage-form" onSubmit={handleSubmit}>
+              <label className="field">
+                id
+                <input
+                  value={form.id}
+                  disabled={!!editingId}
+                  onChange={(e) => setForm({ ...form, id: e.target.value })}
+                  placeholder="unique-slug"
+                />
+              </label>
 
-          <div className="field-row">
-            <label className="field">
-              source
-              <select value={form.source} onChange={(e) => setForm({ ...form, source: e.target.value })}>
-                {nodes.map((n) => (
-                  <option key={n.id} value={n.id}>
-                    {n.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field">
-              target
-              <select value={form.target} onChange={(e) => setForm({ ...form, target: e.target.value })}>
-                {nodes.map((n) => (
-                  <option key={n.id} value={n.id}>
-                    {n.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+              <div className="field-row">
+                <label className="field">
+                  source
+                  <select value={form.source} onChange={(e) => setForm({ ...form, source: e.target.value })}>
+                    {nodes.map((n) => (
+                      <option key={n.id} value={n.id}>
+                        {n.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field">
+                  target
+                  <select value={form.target} onChange={(e) => setForm({ ...form, target: e.target.value })}>
+                    {nodes.map((n) => (
+                      <option key={n.id} value={n.id}>
+                        {n.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
 
-          <div className="field-row">
-            <label className="field">
-              kind
-              <select value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value as EdgeKind })}>
-                {EDGE_KINDS.map((k) => (
-                  <option key={k} value={k}>
-                    {k}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field">
-              volume
-              <input
-                type="number"
-                min={1}
-                max={10}
-                value={form.volume}
-                onChange={(e) => setForm({ ...form, volume: e.target.value })}
-              />
-            </label>
-          </div>
+              <div className="field-row">
+                <label className="field">
+                  kind
+                  <select value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value as EdgeKind })}>
+                    {EDGE_KINDS.map((k) => (
+                      <option key={k} value={k}>
+                        {k}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field">
+                  volume
+                  <input
+                    type="number"
+                    min={1}
+                    max={10}
+                    value={form.volume}
+                    onChange={(e) => setForm({ ...form, volume: e.target.value })}
+                  />
+                </label>
+              </div>
 
-          {error && <div className="form-error">{error}</div>}
+              {error && <div className="form-error">{error}</div>}
 
-          <div className="form-actions">
-            <button type="submit" className="primary-btn" disabled={busy}>
-              {editingId ? 'Save' : 'Create'}
-            </button>
-            <button type="button" className="text-btn" onClick={cancel}>
-              <X size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-              Cancel
-            </button>
-          </div>
-        </form>
-      )}
+              <div className="form-actions">
+                <button type="submit" className="primary-btn" disabled={busy}>
+                  {editingId ? 'Save' : 'Create'}
+                </button>
+                <button type="button" className="text-btn" onClick={cancel}>
+                  <X size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <ConfirmModal
+        isOpen={deleteTarget !== null}
+        title="Delete edge"
+        message="Delete this edge?"
+        busy={busy}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   )
 }

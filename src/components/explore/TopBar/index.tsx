@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Pause, Play, TimerReset } from 'lucide-react';
+import { Maximize, Minimize, Pause, Play, TimerReset } from 'lucide-react';
 import { SettingsPopover } from '@/components/explore/SettingsPopover'
 import type { SceneSettings } from '@/components/explore/SettingsPopover/constants'
 import './TopBar.css'
@@ -15,6 +16,22 @@ interface TopBarProps {
 const TAP_TRANSITION = { duration: 0.15 }
 
 export function TopBar({ autoRotate, onToggleAutoRotate, onResetView, settings, onChangeSettings }: TopBarProps) {
+  const [isFullscreen, setIsFullscreen] = useState(() => Boolean(document.fullscreenElement))
+
+  useEffect(() => {
+    const handleFullscreenChange = () => setIsFullscreen(Boolean(document.fullscreenElement))
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
+  }, [])
+
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen()
+    } else {
+      document.documentElement.requestFullscreen()
+    }
+  }
+
   return (
     <header className="top-bar">
       <div className="top-bar-controls">
@@ -40,6 +57,16 @@ export function TopBar({ autoRotate, onToggleAutoRotate, onResetView, settings, 
           transition={TAP_TRANSITION}
         >
           <TimerReset />
+        </motion.button>
+        <motion.button
+          className="toggle-btn glass-btn"
+          onClick={toggleFullscreen}
+          whileTap={{ scale: 0.86 }}
+          transition={TAP_TRANSITION}
+          aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+        >
+          {isFullscreen ? <Minimize /> : <Maximize />}
         </motion.button>
         <SettingsPopover settings={settings} onChange={onChangeSettings} />
       </div>

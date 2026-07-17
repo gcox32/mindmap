@@ -66,17 +66,15 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleSelect(null)
-        setSearchQuery('')
-        searchInputRef.current?.blur()
-        return
-      }
-
       const isMod = e.metaKey || e.ctrlKey
       if (!isMod) return
 
-      if (e.key.toLowerCase() === 'p') {
+      if (e.key.toLowerCase() === 'x') {
+        e.preventDefault()
+        handleSelect(null)
+        setSearchQuery('')
+        searchInputRef.current?.blur()
+      } else if (e.key.toLowerCase() === 'p') {
         e.preventDefault()
         setAutoRotate((v) => !v)
       } else if (e.key.toLowerCase() === 'r') {

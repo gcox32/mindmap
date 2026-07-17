@@ -3,6 +3,11 @@ import type { GraphNode, GraphEdge } from './types'
 export const nodes: GraphNode[] = [
   { id: 'nucleus', type: 'nucleus', label: 'Eventide Analytics' },
 
+  // --- Servers ---
+  // Higher in the hierarchy than the databases they run, but tightly
+  // coupled to them (short 'hosts' edge, see below).
+  { id: 'trading-db-server', type: 'server', label: 'db-prod-01', description: 'Bare-metal host running the trading database.' },
+
   // --- Sources ---
   { id: 'bloomberg', type: 'source', subtype: 'api', label: 'Bloomberg', description: 'Real-time market data feed (equities, FX, rates).' },
   { id: 'internal-db', type: 'source', subtype: 'database', label: 'Trading DB', description: 'Internal OLTP database of trades and positions.' },
@@ -31,6 +36,9 @@ export const nodes: GraphNode[] = [
   { id: 'pdf-report', type: 'output', subtype: 'pdf', label: 'PDF Investor Report', description: 'Formatted PDF distributed to investors.' },
   { id: 's3-archive', type: 'output', subtype: 'archive', label: 'S3 Archive', description: 'Long-term cold storage of normalized price history.' },
 
+  // --- Stakeholders ---
+  { id: 'cio', type: 'stakeholder', label: 'CIO', description: 'Receives the daily investor report and email digest.' },
+
   // --- Secondary server: APAC desk (near-self-contained regional node) ---
   { id: 'apac-nucleus', type: 'nucleus', label: 'APAC Desk', description: 'Secondary regional server — mirrors the core pipeline for APAC markets, mostly self-contained.' },
   { id: 'apac-feed', type: 'source', subtype: 'api', label: 'SGX Feed', description: 'Real-time market data feed for APAC exchanges.' },
@@ -39,6 +47,9 @@ export const nodes: GraphNode[] = [
 ]
 
 const edgeDefs: Array<Omit<GraphEdge, 'id'>> = [
+  // server hosts its database — tight structural coupling, not a data flow
+  { source: 'trading-db-server', target: 'internal-db', kind: 'hosts', volume: 5 },
+
   // nucleus ties the three domains together — structural, not a real data flow
   { source: 'nucleus', target: 'bloomberg', kind: 'feeds', volume: 2 },
   { source: 'nucleus', target: 'internal-db', kind: 'feeds', volume: 2 },
@@ -76,6 +87,9 @@ const edgeDefs: Array<Omit<GraphEdge, 'id'>> = [
   { source: 'report-builder', target: 'website-dashboard', kind: 'produces', volume: 3 },
   { source: 'report-builder', target: 'email-digest', kind: 'produces', volume: 1 },
   { source: 'report-builder', target: 'pdf-report', kind: 'produces', volume: 1 },
+
+  // output reaches its stakeholder
+  { source: 'pdf-report', target: 'cio', kind: 'feeds', volume: 1 },
 
   // feedback loop: an output becomes a source for another process
   { source: 'sql-positions', target: 'risk-model', kind: 'cycles', volume: 2 },

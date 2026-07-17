@@ -5,16 +5,23 @@ import type { EdgeKind, NodeSubtype, NodeType } from '@/data/types'
 // output darkest/most desaturated).
 export const NODE_COLOR: Record<NodeType, string> = {
   nucleus: '#eaf1ff',
+  server: '#addbff',
   source: '#8fb8ff',
   process: '#5c85c2',
   output: '#3d5279',
+  stakeholder: '#293654',
 }
 
+// server sits above source/database in the hierarchy (it's the host the
+// database runs on) but isn't a whole regional hub like nucleus, so its
+// radius lands between the two.
 const BASE_RADIUS_BY_TYPE: Record<NodeType, number> = {
   nucleus: 8,
+  server: 4.6,
   source: 3.2,
   process: 2.8,
   output: 2.8,
+  stakeholder: 2.8,
 }
 
 // Subtypes that behave like shared infrastructure hubs in a real system
@@ -40,6 +47,7 @@ export const EDGE_COLOR: Record<EdgeKind, string> = {
   spawns: '#b9cdec',
   produces: '#eef3fc',
   cycles: '#ff6b6b',
+  hosts: '#ffd685',
 }
 
 export const EDGE_DASHED: Record<EdgeKind, boolean> = {
@@ -47,6 +55,7 @@ export const EDGE_DASHED: Record<EdgeKind, boolean> = {
   spawns: false,
   produces: false,
   cycles: true,
+  hosts: false,
 }
 
 const VOLUME_RANGE: [number, number] = [1, 10]

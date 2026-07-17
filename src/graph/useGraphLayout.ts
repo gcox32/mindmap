@@ -14,19 +14,32 @@ const COLLIDE_PADDING = 6
 // secondary servers hold their own presence and push their satellites into
 // a distinct sub-cluster, even though (unlike the primary) they aren't
 // pinned and are free to drift as the layout settles.
+// server sits above source/database in the hierarchy (it's the host the
+// database runs on), so it gets more repulsion than a plain leaf node —
+// but nowhere near nucleus, since it isn't a whole regional hub.
 const CHARGE_STRENGTH_BY_TYPE: Record<GraphNode['type'], number> = {
   nucleus: -520,
+  server: -260,
   source: -140,
   process: -140,
   output: -140,
+  stakeholder: -140,
 }
 
+// `hosts` (server -> the database it runs) is much shorter than a normal
+// data-flow edge, pulling the pair into a tight, visually-coupled unit.
 const LINK_DISTANCE_BY_KIND: Record<GraphEdge['kind'], number> = {
   feeds: 34,
   spawns: 20,
   produces: 30,
   cycles: 60,
+  hosts: 8,
 }
+
+const LINK_STRENGTH_BY_KIND: Partial<Record<GraphEdge['kind'], number>> = {
+  hosts: 0.9,
+}
+const DEFAULT_LINK_STRENGTH = 0.5
 
 type SimNode = GraphNode & SimulationNodeDatum3D
 type SimLink = SimulationLinkDatum3D<SimNode> & { kind: GraphEdge['kind'] }
@@ -46,7 +59,7 @@ export function computeLayout(nodes: GraphNode[], edges: GraphEdge[]): Positione
       forceLink<SimNode, SimLink>(simLinks)
         .id((d) => d.id)
         .distance((l) => LINK_DISTANCE_BY_KIND[l.kind])
-        .strength(0.5),
+        .strength((l) => LINK_STRENGTH_BY_KIND[l.kind] ?? DEFAULT_LINK_STRENGTH),
     )
     .force('center', forceCenter(0, 0, 0))
     .force(

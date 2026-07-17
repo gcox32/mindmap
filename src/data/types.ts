@@ -1,4 +1,4 @@
-export type NodeType = 'nucleus' | 'source' | 'process' | 'output'
+export type NodeType = 'nucleus' | 'server' | 'source' | 'process' | 'output' | 'stakeholder'
 
 export type NodeSubtype =
   | 'api'
@@ -26,7 +26,8 @@ export interface GraphNode {
   schedule?: string
 }
 
-export type EdgeKind = 'feeds' | 'spawns' | 'produces' | 'cycles'
+/** `hosts` marks tight structural coupling (e.g. a server hosting the database it runs), not a data flow. */
+export type EdgeKind = 'feeds' | 'spawns' | 'produces' | 'cycles' | 'hosts'
 
 export interface GraphEdge {
   id: string

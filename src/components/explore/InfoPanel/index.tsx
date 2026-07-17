@@ -18,6 +18,7 @@ const EDGE_KIND_LABEL: Record<GraphEdge['kind'], string> = {
   spawns: 'spawns',
   produces: 'produces',
   cycles: 'cycles back into',
+  hosts: 'hosts',
 }
 
 const SPRING_GENTLE = { type: 'spring', stiffness: 300, damping: 28 } as const

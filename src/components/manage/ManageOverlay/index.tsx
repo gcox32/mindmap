@@ -4,6 +4,8 @@ import { NodeManager } from '@/components/manage/NodeManager'
 import { EdgeManager } from '@/components/manage/EdgeManager'
 import './ManageOverlay.css'
 
+const SPRING_GENTLE = { type: 'spring', stiffness: 300, damping: 28 } as const
+
 interface ManageOverlayProps {
   nodes: GraphNode[]
   edges: GraphEdge[]
@@ -33,12 +35,16 @@ export function ManageOverlay({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
-      <div className="panel manage-panel">
+      <motion.div 
+        className="manage-panel" 
+        layout 
+        transition={SPRING_GENTLE}
+      >
         <NodeManager nodes={nodes} onCreate={onCreateNode} onUpdate={onUpdateNode} onDelete={onDeleteNode} />
-      </div>
-      <div className="panel manage-panel">
+      </motion.div>
+      <motion.div className="manage-panel" layout transition={SPRING_GENTLE}>
         <EdgeManager nodes={nodes} edges={edges} onCreate={onCreateEdge} onUpdate={onUpdateEdge} onDelete={onDeleteEdge} />
-      </div>
+      </motion.div>
     </motion.div>
   )
 }

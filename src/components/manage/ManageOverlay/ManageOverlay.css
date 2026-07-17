@@ -18,6 +18,9 @@
   flex-direction: column;
   gap: 16px;
   overflow: hidden;
+  backdrop-filter: blur(18px) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(18px) saturate(var(--glass-saturation));
+  border-radius: 12px;
 }
 
 /* Shared section heading, mirrors .overview-panel-title. */
@@ -92,6 +95,10 @@
 
 .icon-btn--danger:hover {
   color: #ff6b6b;
+}
+
+.manage-form-collapse {
+  overflow: hidden;
 }
 
 .manage-form {
@@ -173,6 +180,14 @@
 .primary-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.primary-btn--danger {
+  background: #b0473f;
+}
+
+.primary-btn--danger:hover {
+  background: #c2554c;
 }
 
 .text-btn {
