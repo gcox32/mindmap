@@ -23,10 +23,17 @@ const SMOOTH_LAMBDA = 10
 const NORMAL_TEXT_COLOR = new THREE.Color('#eaf1ff')
 const DIMMED_TEXT_COLOR = new THREE.Color('#4a5568')
 
+// Vertical offsets (as a fraction of node radius) for the three plates of the
+// `database` subtype's stacked-disc badge — a classic DB-cylinder silhouette
+// that reads as its own shape from any camera angle, unlike the billboarded
+// glow sprites everything else uses.
+const DB_DISC_OFFSETS = [-0.55, 0, 0.55]
+
 export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSelect, interactive }: NodeMeshProps) {
   const glowRef = useRef<THREE.Sprite>(null)
   const coreRef = useRef<THREE.Sprite>(null)
   const shellRef = useRef<THREE.Mesh>(null)
+  const dbStackRef = useRef<THREE.Group>(null)
   // troika-three-text's Text mesh isn't meaningfully typeable here; we only
   // touch .fillOpacity/.color imperatively, same as its own prop handling.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,6 +52,7 @@ export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSel
   const targetCoreOpacity = (isSelected ? 1 : isHovered ? 0.95 : 0.85) * targetDimFactor
   const targetEmphasis = isSelected ? 1.3 : isHovered ? 1.15 : 1
   const targetShellOpacity = 0.12 * targetDimFactor
+  const targetBadgeOpacity = (isSelected ? 0.7 : isHovered ? 0.6 : 0.45) * targetDimFactor
   const targetLabelOpacity = isDimmed ? 0.3 : isHovered || isSelected ? 1 : 0.75
   const targetDimAmount = isDimmed ? 1 : 0
 
@@ -53,6 +61,7 @@ export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSel
     coreOpacity: targetCoreOpacity,
     emphasis: targetEmphasis,
     shellOpacity: targetShellOpacity,
+    badgeOpacity: targetBadgeOpacity,
     labelOpacity: targetLabelOpacity,
     dimAmount: targetDimAmount,
   })
@@ -66,6 +75,7 @@ export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSel
     s.coreOpacity = THREE.MathUtils.damp(s.coreOpacity, targetCoreOpacity, SMOOTH_LAMBDA, delta)
     s.emphasis = THREE.MathUtils.damp(s.emphasis, targetEmphasis, SMOOTH_LAMBDA, delta)
     s.shellOpacity = THREE.MathUtils.damp(s.shellOpacity, targetShellOpacity, SMOOTH_LAMBDA, delta)
+    s.badgeOpacity = THREE.MathUtils.damp(s.badgeOpacity, targetBadgeOpacity, SMOOTH_LAMBDA, delta)
     s.labelOpacity = THREE.MathUtils.damp(s.labelOpacity, targetLabelOpacity, SMOOTH_LAMBDA, delta)
     s.dimAmount = THREE.MathUtils.damp(s.dimAmount, targetDimAmount, SMOOTH_LAMBDA, delta)
 
@@ -81,6 +91,15 @@ export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSel
       shellRef.current.rotation.y = -t * 0.06
       shellRef.current.rotation.x = t * 0.04
       ;(shellRef.current.material as THREE.MeshBasicMaterial).opacity = s.shellOpacity
+    }
+    if (dbStackRef.current && node.subtype === 'database') {
+      dbStackRef.current.scale.setScalar(s.emphasis)
+      for (const child of dbStackRef.current.children) {
+        const disc = child as THREE.Group
+        const [fill, outline] = disc.children as THREE.Mesh[]
+        ;(fill.material as THREE.MeshBasicMaterial).opacity = s.badgeOpacity * 0.45
+        ;(outline.material as THREE.MeshBasicMaterial).opacity = s.badgeOpacity
+      }
     }
     if (textRef.current) {
       textRef.current.fillOpacity = s.labelOpacity
@@ -148,6 +167,29 @@ export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSel
       )}
 
       {node.type === 'nucleus' && <pointLight color={color} intensity={35} distance={140} decay={2} />}
+
+      {node.subtype === 'database' && (
+        <group ref={dbStackRef}>
+          {DB_DISC_OFFSETS.map((offset) => (
+            <group key={offset} position={[0, offset * baseRadius, 0]}>
+              <mesh>
+                <cylinderGeometry args={[baseRadius * 0.9, baseRadius * 0.9, baseRadius * 0.32, 28]} />
+                <meshBasicMaterial
+                  color={color}
+                  transparent
+                  opacity={targetBadgeOpacity * 0.45}
+                  blending={THREE.AdditiveBlending}
+                  depthWrite={false}
+                />
+              </mesh>
+              <mesh>
+                <cylinderGeometry args={[baseRadius * 0.9, baseRadius * 0.9, baseRadius * 0.32, 28]} />
+                <meshBasicMaterial color={color} wireframe transparent opacity={targetBadgeOpacity} depthWrite={false} />
+              </mesh>
+            </group>
+          ))}
+        </group>
+      )}
 
       <Billboard position={[0, baseRadius + 4, 0]}>
         <Text

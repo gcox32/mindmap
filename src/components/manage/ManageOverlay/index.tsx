@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import type { GraphEdge, GraphNode } from '@/data/types'
-import { NodeManager } from '@/components/manage/NodeManager'
-import { EdgeManager } from '@/components/manage/EdgeManager'
+import { useNodeManager, NodeList, NodeForm } from '@/components/manage/NodeManager'
+import { useEdgeManager, EdgeList, EdgeForm } from '@/components/manage/EdgeManager'
 import './ManageOverlay.css'
 
 const SPRING_GENTLE = { type: 'spring', stiffness: 300, damping: 28 } as const
@@ -27,6 +27,9 @@ export function ManageOverlay({
   onUpdateEdge,
   onDeleteEdge,
 }: ManageOverlayProps) {
+  const nodeManager = useNodeManager({ onCreate: onCreateNode, onUpdate: onUpdateNode, onDelete: onDeleteNode })
+  const edgeManager = useEdgeManager({ nodes, onCreate: onCreateEdge, onUpdate: onUpdateEdge, onDelete: onDeleteEdge })
+
   return (
     <motion.div
       className="manage-overlay"
@@ -35,15 +38,17 @@ export function ManageOverlay({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
-      <motion.div 
-        className="manage-panel" 
-        layout 
-        transition={SPRING_GENTLE}
-      >
-        <NodeManager nodes={nodes} onCreate={onCreateNode} onUpdate={onUpdateNode} onDelete={onDeleteNode} />
+      <motion.div className="manage-panel manage-panel--list" layout transition={SPRING_GENTLE}>
+        <NodeList nodes={nodes} manager={nodeManager} />
       </motion.div>
-      <motion.div className="manage-panel" layout transition={SPRING_GENTLE}>
-        <EdgeManager nodes={nodes} edges={edges} onCreate={onCreateEdge} onUpdate={onUpdateEdge} onDelete={onDeleteEdge} />
+      <motion.div className="manage-panel manage-panel--form" layout transition={SPRING_GENTLE}>
+        <NodeForm manager={nodeManager} />
+      </motion.div>
+      <motion.div className="manage-panel manage-panel--form" layout transition={SPRING_GENTLE}>
+        <EdgeForm nodes={nodes} manager={edgeManager} />
+      </motion.div>
+      <motion.div className="manage-panel manage-panel--list" layout transition={SPRING_GENTLE}>
+        <EdgeList edges={edges} manager={edgeManager} />
       </motion.div>
     </motion.div>
   )

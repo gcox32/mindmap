@@ -1,3 +1,3 @@
 # TODO
-- [ ] Toggle on/off star background
-- [ ] Manage view for node + edge CRUD
+- [x] Toggle on/off star background
+- [x] Manage view for node + edge CRUD

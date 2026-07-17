@@ -11,16 +11,25 @@
 
 .manage-panel {
   position: static;
-  width: 420px;
-  max-height: calc(100vh - 140px);
   padding: 20px 22px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   overflow: hidden;
+  background: rgba(20, 26, 42, 0.86);
   backdrop-filter: blur(18px) saturate(var(--glass-saturation));
   -webkit-backdrop-filter: blur(18px) saturate(var(--glass-saturation));
   border-radius: 12px;
+  box-shadow: var(--glass-reflex-panel), 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.manage-panel--list {
+  width: 300px;
+  height: calc(100vh - 64px);
+}
+
+.manage-panel--form {
+  width: 380px;
 }
 
 /* Shared section heading, mirrors .overview-panel-title. */
@@ -82,7 +91,7 @@
   background: none;
   color: #9ca3af;
   padding: 5px;
-  border-radius: 6px;
+  border-radius: 999px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -95,10 +104,6 @@
 
 .icon-btn--danger:hover {
   color: #ff6b6b;
-}
-
-.manage-form-collapse {
-  overflow: hidden;
 }
 
 .manage-form {

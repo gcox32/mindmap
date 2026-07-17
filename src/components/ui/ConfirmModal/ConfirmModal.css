@@ -8,12 +8,13 @@
   background: rgba(6, 9, 17, 0.55);
 }
 
-.confirm-modal {
+.panel.confirm-modal {
   width: 320px;
   padding: 20px 22px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  background: rgba(20, 26, 42, 0.86);
 }
 
 .confirm-modal-title {
