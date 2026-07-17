@@ -15,10 +15,11 @@ interface NodeManagerProps {
   onDelete: (id: string) => Promise<void>
 }
 
-const NODE_TYPES: NodeType[] = ['nucleus', 'server', 'source', 'process', 'output', 'stakeholder']
+const NODE_TYPES: NodeType[] = ['nucleus', 'source', 'process', 'output', 'stakeholder']
 const NODE_SUBTYPES: NodeSubtype[] = [
   'api',
   'database',
+  'server',
   'object-storage',
   'scraper',
   'ftp',

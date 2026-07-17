@@ -3,12 +3,11 @@ import type { GraphNode, GraphEdge } from './types'
 export const nodes: GraphNode[] = [
   { id: 'nucleus', type: 'nucleus', label: 'Eventide Analytics' },
 
-  // --- Servers ---
-  // Higher in the hierarchy than the databases they run, but tightly
-  // coupled to them (short 'hosts' edge, see below).
-  { id: 'trading-db-server', type: 'server', label: 'db-prod-01', description: 'Bare-metal host running the trading database.' },
-
   // --- Sources ---
+  // `server` outranks `database` in the hierarchy (it's the host the
+  // database runs on) despite both being plain `source` subtypes — the two
+  // stay tightly coupled via the short 'hosts' edge below, not via type.
+  { id: 'trading-db-server', type: 'source', subtype: 'server', label: 'db-prod-01', description: 'Bare-metal host running the trading database.' },
   { id: 'bloomberg', type: 'source', subtype: 'api', label: 'Bloomberg', description: 'Real-time market data feed (equities, FX, rates).' },
   { id: 'internal-db', type: 'source', subtype: 'database', label: 'Trading DB', description: 'Internal OLTP database of trades and positions.' },
   { id: 's3-raw', type: 'source', subtype: 'object-storage', label: 'Raw Landing Zone', description: 'S3 bucket where unprocessed vendor files land.' },
@@ -47,7 +46,8 @@ export const nodes: GraphNode[] = [
 ]
 
 const edgeDefs: Array<Omit<GraphEdge, 'id'>> = [
-  // server hosts its database — tight structural coupling, not a data flow
+  // server subtype hosts the database subtype it runs — tight structural
+  // coupling, not a data flow
   { source: 'trading-db-server', target: 'internal-db', kind: 'hosts', volume: 5 },
 
   // nucleus ties the three domains together — structural, not a real data flow

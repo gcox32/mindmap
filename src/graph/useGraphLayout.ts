@@ -14,20 +14,18 @@ const COLLIDE_PADDING = 6
 // secondary servers hold their own presence and push their satellites into
 // a distinct sub-cluster, even though (unlike the primary) they aren't
 // pinned and are free to drift as the layout settles.
-// server sits above source/database in the hierarchy (it's the host the
-// database runs on), so it gets more repulsion than a plain leaf node —
-// but nowhere near nucleus, since it isn't a whole regional hub.
 const CHARGE_STRENGTH_BY_TYPE: Record<GraphNode['type'], number> = {
   nucleus: -520,
-  server: -260,
   source: -140,
   process: -140,
   output: -140,
   stakeholder: -140,
 }
 
-// `hosts` (server -> the database it runs) is much shorter than a normal
-// data-flow edge, pulling the pair into a tight, visually-coupled unit.
+// `hosts` (a server subtype -> the database subtype it runs) is much
+// shorter than a normal data-flow edge, pulling the pair into a tight,
+// visually-coupled unit even though node size/charge already reflect
+// server's higher rank via RADIUS_BONUS_BY_SUBTYPE (see style.ts).
 const LINK_DISTANCE_BY_KIND: Record<GraphEdge['kind'], number> = {
   feeds: 34,
   spawns: 20,

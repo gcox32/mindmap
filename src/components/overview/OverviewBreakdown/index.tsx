@@ -8,7 +8,6 @@ interface OverviewBreakdownProps {
 }
 
 const TYPE_ENTRIES: Array<{ type: NodeType; label: string }> = [
-  { type: 'server', label: 'Servers' },
   { type: 'source', label: 'Sources' },
   { type: 'process', label: 'Processes' },
   { type: 'output', label: 'Outputs' },

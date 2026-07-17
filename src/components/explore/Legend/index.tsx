@@ -10,7 +10,6 @@ interface LegendProps {
 
 const NODE_ENTRIES: Array<{ type: keyof typeof NODE_COLOR; label: string }> = [
   { type: 'nucleus', label: 'Nucleus' },
-  { type: 'server', label: 'Server' },
   { type: 'source', label: 'Source' },
   { type: 'process', label: 'Process' },
   { type: 'output', label: 'Output' },

@@ -5,19 +5,14 @@ import type { EdgeKind, NodeSubtype, NodeType } from '@/data/types'
 // output darkest/most desaturated).
 export const NODE_COLOR: Record<NodeType, string> = {
   nucleus: '#eaf1ff',
-  server: '#addbff',
   source: '#8fb8ff',
   process: '#5c85c2',
   output: '#3d5279',
   stakeholder: '#293654',
 }
 
-// server sits above source/database in the hierarchy (it's the host the
-// database runs on) but isn't a whole regional hub like nucleus, so its
-// radius lands between the two.
 const BASE_RADIUS_BY_TYPE: Record<NodeType, number> = {
   nucleus: 8,
-  server: 4.6,
   source: 3.2,
   process: 2.8,
   output: 2.8,
@@ -28,7 +23,12 @@ const BASE_RADIUS_BY_TYPE: Record<NodeType, number> = {
 // (databases, object stores) get a deliberate size bump. This is a stand-in
 // for "this naturally has more connections" decided by what the node *is*,
 // rather than sizing dynamically off the current graph's edge count.
+// `server` outranks `database` here — it's the host the database runs on,
+// higher in the hierarchy even though both are plain `source` subtypes —
+// and the two stay visually tight via the short `hosts` edge (see
+// useGraphLayout.ts), not via node size alone.
 const RADIUS_BONUS_BY_SUBTYPE: Partial<Record<NodeSubtype, number>> = {
+  server: 3,
   database: 2.2,
   'object-storage': 1.6,
   'sql-table': 1.2,

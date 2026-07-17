@@ -1,8 +1,9 @@
-export type NodeType = 'nucleus' | 'server' | 'source' | 'process' | 'output' | 'stakeholder'
+export type NodeType = 'nucleus' | 'source' | 'process' | 'output' | 'stakeholder'
 
 export type NodeSubtype =
   | 'api'
   | 'database'
+  | 'server'
   | 'object-storage'
   | 'scraper'
   | 'ftp'

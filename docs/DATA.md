@@ -21,13 +21,12 @@ interface GraphNode {
 
 ### `NodeType`
 
-The six node types roughly form a hierarchy, from structural hub down to
+The five node types roughly form a hierarchy, from structural hub down to
 leaf, with `stakeholder` sitting outside that spine as an external consumer:
 
 | type | role | visual weight | layout charge |
 |---|---|---|---|
 | `nucleus` | The root of a pipeline (a company, or a self-contained regional pipeline). The *first* nucleus in the dataset is pinned to the world origin as the camera's fixed anchor; any further nuclei are secondary/near-self-contained servers, unpinned but given strong repulsion so they hold their own sub-cluster. | brightest, largest | strongest (`-520`) |
-| `server` | A physical/virtual host — higher in the hierarchy than the data it holds (e.g. the box a database runs on), but not a whole pipeline root like `nucleus`. | bright, above-average size | above-average (`-260`) |
 | `source` | Where data originates: an API, database, scraper, FTP drop, etc. — see `subtype`. | mid | baseline (`-140`) |
 | `process` | A script or job that transforms data — cron-scheduled or spawned as a child of another process. | mid, slightly darker | baseline (`-140`) |
 | `output` | A terminal artifact a pipeline produces: a dashboard, table, report, alert. | darkest of the flow types | baseline (`-140`) |
@@ -46,20 +45,24 @@ An optional finer-grained tag on `source`/`process`/`output` nodes — not
 type-checked against its parent `type` (any subtype is technically valid on
 any node), but used by convention as:
 
-- **source subtypes**: `api`, `database`, `object-storage`, `scraper`, `ftp`
+- **source subtypes**: `api`, `database`, `server`, `object-storage`, `scraper`, `ftp`
 - **process subtypes**: `script`, `cron-script`, `child-script`
 - **output subtypes**: `website`, `email`, `sql-table`, `slack`, `pdf`, `archive`
 
-A couple of subtypes ("shared infrastructure" ones — `database`,
+A couple of subtypes ("shared infrastructure" ones — `server`, `database`,
 `object-storage`, `sql-table`) get a size bump via
 `RADIUS_BONUS_BY_SUBTYPE` in `style.ts`, standing in for "this naturally has
 more connections in a real system" without sizing dynamically off the
-current graph's edge count.
+current graph's edge count. `server` deliberately gets the largest bump of
+the group (`3` vs. `database`'s `2.2`) — a server outranks the database
+running on it, even though both are plain `source` nodes distinguished only
+by `subtype`. That size difference alone doesn't keep them visually
+together, though — see the `hosts` edge kind below for what actually pins a
+server next to its database in the layout.
 
-`server` and `stakeholder` don't currently have their own subtypes — add
-some the same way (extend `NodeSubtype`, add entries to `NODE_SUBTYPES` in
-`NodeManager`) if you need to distinguish e.g. a physical host from a
-managed cloud instance, or an internal team from an external customer.
+`stakeholder` doesn't currently have its own subtypes — add some the same
+way (extend `NodeSubtype`, add entries to `NODE_SUBTYPES` in `NodeManager`)
+if you need to distinguish e.g. an internal team from an external customer.
 
 ## Edges (`GraphEdge`)
 
@@ -85,7 +88,7 @@ structural containment, no flow at all.
 | `spawns` | One process launches another at runtime — parent/child scripts, not a data handoff. | `risk-model → risk-worker-1` | pale blue, solid |
 | `produces` | A process generates a terminal output artifact. | `report-builder → pdf-report` | near-white, solid |
 | `cycles` | A feedback loop: an output becomes an input to an earlier process, closing the pipeline back on itself. Styled as a deliberate, distinct signal rather than blending in with normal flow. | `sql-positions → risk-model` | red, dashed |
-| `hosts` | Structural coupling: a server hosting the database (or other resource) that runs on it — not a data flow. Tuned in `useGraphLayout.ts` with a much shorter link distance (`8` vs. `34` for `feeds`) and higher link strength (`0.9` vs. the default `0.5`), so the pair clamps into a visually tight unit regardless of where the rest of the graph settles. | `trading-db-server → internal-db` | gold, solid |
+| `hosts` | Structural coupling: a `server`-subtype node hosting the `database`-subtype (or other resource) node that runs on it — not a data flow. Tuned in `useGraphLayout.ts` with a much shorter link distance (`8` vs. `34` for `feeds`) and higher link strength (`0.9` vs. the default `0.5`), so the pair clamps into a visually tight unit regardless of where the rest of the graph settles. | `trading-db-server → internal-db` | gold, solid |
 
 Edge color/dash live in `EDGE_COLOR`/`EDGE_DASHED` (`style.ts`); link
 distance/strength live in `LINK_DISTANCE_BY_KIND`/`LINK_STRENGTH_BY_KIND`
@@ -98,6 +101,10 @@ edge and a near-continuous one still read differently even though they
 share a kind.
 
 ## Adding a node type or edge kind
+
+This is the heavier change — a new top-level category of node (something
+that isn't just a flavor of an existing one; see "Adding a subtype" below
+for the lighter path):
 
 1. Add the literal to `NodeType`/`EdgeKind` in `src/data/types.ts`.
 2. Run `npx tsc -b` (or `npm run build`) — every `Record<NodeType, …>` /
@@ -113,6 +120,23 @@ share a kind.
 4. Optionally add an example node/edge to `dummyData.ts` so the new type is
    actually visible in local dev.
 5. No backend changes needed — see below.
+
+## Adding a subtype
+
+The lighter path — a new flavor of an existing `NodeType` (this is how
+`server` was added: a `source` subtype ranked above `database`, not a new
+top-level type):
+
+1. Add the literal to `NodeSubtype` in `src/data/types.ts`.
+2. Add it to `NODE_SUBTYPES` in `NodeManager` (the create/edit dropdown) —
+   this isn't type-checked against the union, so it's easy to forget.
+3. Optionally give it a `RADIUS_BONUS_BY_SUBTYPE` entry in `style.ts` if it
+   should read as more/less prominent than its siblings.
+4. If the subtype needs to visually cluster with another node regardless of
+   the rest of the layout (like `server` does with `database`), reach for a
+   dedicated `EdgeKind` with a short `LINK_DISTANCE_BY_KIND` /
+   `LINK_STRENGTH_BY_KIND` entry (see `hosts` above) rather than trying to
+   force it via subtype/size alone.
 
 ## Frontend/backend contract
 
