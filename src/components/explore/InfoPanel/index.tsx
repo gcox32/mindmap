@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { GraphEdge, GraphNode } from '@/data/types'
-import { NODE_COLOR } from '@/graph/style'
+import { NODE_COLOR, getPrimaryAttributeLabel } from '@/graph/style'
 import { computeFocusSet } from '@/graph/traversal'
 import './InfoPanel.css'
 
@@ -16,6 +16,7 @@ interface InfoPanelProps {
 const EDGE_KIND_LABEL: Record<GraphEdge['kind'], string> = {
   feeds: 'feeds into',
   spawns: 'spawns',
+  calls: 'calls',
   produces: 'produces',
   cycles: 'cycles back into',
   hosts: 'hosts',
@@ -87,9 +88,10 @@ export function InfoPanel({ node, nodes, edges, onSelect, onClose }: InfoPanelPr
             </div>
 
             {node.description && <p className="description">{node.description}</p>}
-            {node.schedule && (
-              <p className="schedule">
-                <span className="label-tag">schedule</span> <code>{node.schedule}</code>
+            {node.primaryAttribute && (
+              <p className="primary-attribute">
+                <span className="label-tag">{getPrimaryAttributeLabel(node) ?? 'detail'}</span>{' '}
+                <code>{node.primaryAttribute}</code>
               </p>
             )}
 

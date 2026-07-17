@@ -19,6 +19,7 @@ const NODE_ENTRIES: Array<{ type: keyof typeof NODE_COLOR; label: string }> = [
 const EDGE_ENTRIES: Array<{ kind: keyof typeof EDGE_COLOR; label: string }> = [
   { kind: 'feeds', label: 'feeds' },
   { kind: 'spawns', label: 'spawns' },
+  { kind: 'calls', label: 'calls' },
   { kind: 'produces', label: 'produces' },
   { kind: 'cycles', label: 'cycles back' },
   { kind: 'hosts', label: 'hosts' },

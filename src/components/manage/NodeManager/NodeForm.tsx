@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import type { GraphNode, NodeSubtype, NodeType } from '@/data/types'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { getPrimaryAttributeLabel } from '@/graph/style'
 import type { NodeManagerState } from './useNodeManager'
 
 const TAP_TRANSITION = { duration: 0.15 }
@@ -20,9 +21,7 @@ const NODE_SUBTYPES: NodeSubtype[] = [
   'website',
   'email',
   'sql-table',
-  'slack',
   'pdf',
-  'archive',
 ]
 
 interface NodeFormProps {
@@ -107,11 +106,10 @@ export function NodeForm({ nodes, manager }: NodeFormProps) {
             </select>
           </label>
           <label className="field">
-            schedule
+            {getPrimaryAttributeLabel({ type: form.type, subtype: form.subtype || undefined }) ?? 'primary attribute'}
             <input
-              value={form.schedule}
-              onChange={(e) => setForm({ ...form, schedule: e.target.value })}
-              placeholder="* * * * *"
+              value={form.primaryAttribute}
+              onChange={(e) => setForm({ ...form, primaryAttribute: e.target.value })}
             />
           </label>
         </div>

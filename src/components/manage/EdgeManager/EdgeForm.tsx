@@ -6,7 +6,7 @@ import type { EdgeManagerState } from './useEdgeManager'
 
 const TAP_TRANSITION = { duration: 0.15 }
 
-const EDGE_KINDS: EdgeKind[] = ['feeds', 'spawns', 'produces', 'cycles', 'hosts']
+const EDGE_KINDS: EdgeKind[] = ['feeds', 'spawns', 'calls', 'produces', 'cycles', 'hosts']
 
 interface EdgeFormProps {
   nodes: GraphNode[]

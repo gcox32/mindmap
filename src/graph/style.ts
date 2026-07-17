@@ -1,5 +1,31 @@
 import type { EdgeKind, NodeSubtype, NodeType } from '@/data/types'
 
+// Label for each subtype's single `primaryAttribute` value (see types.ts).
+// Stakeholder has no subtype, so it's keyed by type instead as a fallback.
+const PRIMARY_ATTRIBUTE_LABEL_BY_SUBTYPE: Partial<Record<NodeSubtype, string>> = {
+  'cron-script': 'Schedule',
+  script: 'Path',
+  'child-script': 'Path',
+  api: 'Endpoint',
+  database: 'Engine',
+  server: 'Host',
+  'object-storage': 'Bucket',
+  scraper: 'Target',
+  ftp: 'Host',
+  website: 'Address',
+  email: 'Recipients',
+  'sql-table': 'Table',
+  pdf: 'Path',
+}
+
+const PRIMARY_ATTRIBUTE_LABEL_BY_TYPE: Partial<Record<NodeType, string>> = {
+  stakeholder: 'Department',
+}
+
+export function getPrimaryAttributeLabel(node: { type: NodeType; subtype?: NodeSubtype }): string | undefined {
+  return (node.subtype && PRIMARY_ATTRIBUTE_LABEL_BY_SUBTYPE[node.subtype]) ?? PRIMARY_ATTRIBUTE_LABEL_BY_TYPE[node.type]
+}
+
 // Deep-blue palette anchored on #2C3855 — hue stays constant, only
 // lightness/saturation shift to distinguish node types (nucleus brightest,
 // output darkest/most desaturated).
@@ -45,6 +71,7 @@ export function getNodeRadius(node: { type: NodeType; subtype?: NodeSubtype }): 
 export const EDGE_COLOR: Record<EdgeKind, string> = {
   feeds: '#dce6f7',
   spawns: '#b9cdec',
+  calls: '#b9cdec',
   produces: '#eef3fc',
   cycles: '#ff6b6b',
   hosts: '#ffd685',
@@ -53,6 +80,7 @@ export const EDGE_COLOR: Record<EdgeKind, string> = {
 export const EDGE_DASHED: Record<EdgeKind, boolean> = {
   feeds: false,
   spawns: false,
+  calls: false,
   produces: false,
   cycles: true,
   hosts: false,

@@ -7,10 +7,10 @@ export type NodeFormState = {
   subtype: NodeSubtype | ''
   label: string
   description: string
-  schedule: string
+  primaryAttribute: string
 }
 
-const EMPTY_FORM: NodeFormState = { id: '', type: 'source', subtype: '', label: '', description: '', schedule: '' }
+const EMPTY_FORM: NodeFormState = { id: '', type: 'source', subtype: '', label: '', description: '', primaryAttribute: '' }
 
 function toForm(node: GraphNode): NodeFormState {
   return {
@@ -19,7 +19,7 @@ function toForm(node: GraphNode): NodeFormState {
     subtype: node.subtype ?? '',
     label: node.label,
     description: node.description ?? '',
-    schedule: node.schedule ?? '',
+    primaryAttribute: node.primaryAttribute ?? '',
   }
 }
 
@@ -38,7 +38,7 @@ function toNode(form: NodeFormState): GraphNode {
     subtype: form.subtype || undefined,
     label: form.label.trim(),
     description: form.description.trim() || undefined,
-    schedule: form.schedule.trim() || undefined,
+    primaryAttribute: form.primaryAttribute.trim() || undefined,
   }
 }
 

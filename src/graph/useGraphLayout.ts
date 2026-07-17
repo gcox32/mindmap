@@ -29,6 +29,7 @@ const CHARGE_STRENGTH_BY_TYPE: Record<GraphNode['type'], number> = {
 const LINK_DISTANCE_BY_KIND: Record<GraphEdge['kind'], number> = {
   feeds: 34,
   spawns: 20,
+  calls: 20,
   produces: 30,
   cycles: 60,
   hosts: 8,

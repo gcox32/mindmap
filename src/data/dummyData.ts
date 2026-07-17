@@ -7,42 +7,42 @@ export const nodes: GraphNode[] = [
   // `server` outranks `database` in the hierarchy (it's the host the
   // database runs on) despite both being plain `source` subtypes — the two
   // stay tightly coupled via the short 'hosts' edge below, not via type.
-  { id: 'trading-db-server', type: 'source', subtype: 'server', label: 'db-prod-01', description: 'Bare-metal host running the trading database.' },
-  { id: 'bloomberg', type: 'source', subtype: 'api', label: 'Bloomberg', description: 'Real-time market data feed (equities, FX, rates).' },
-  { id: 'internal-db', type: 'source', subtype: 'database', label: 'Trading DB', description: 'Internal OLTP database of trades and positions.' },
-  { id: 's3-raw', type: 'source', subtype: 'object-storage', label: 'Raw Landing Zone', description: 'S3 bucket where unprocessed vendor files land.' },
-  { id: 'news-scraper', type: 'source', subtype: 'scraper', label: 'News Scraper', description: 'Scrapes financial news sites for headlines.' },
-  { id: 'vendor-ftp', type: 'source', subtype: 'ftp', label: 'Vendor FTP', description: 'Nightly FTP drop from a third-party data vendor.' },
+  { id: 'trading-db-server', type: 'source', subtype: 'server', label: 'db-prod-01', primaryAttribute: 'db-prod-01.internal', description: 'Bare-metal host running the trading database.' },
+  { id: 'bloomberg', type: 'source', subtype: 'api', label: 'Bloomberg', primaryAttribute: 'https://api.bloomberg.com/v3/market-data', description: 'Real-time market data feed (equities, FX, rates).' },
+  { id: 'internal-db', type: 'source', subtype: 'database', label: 'Trading DB', primaryAttribute: 'PostgreSQL 14', description: 'Internal OLTP database of trades and positions.' },
+  { id: 's3-raw', type: 'source', subtype: 'object-storage', label: 'Raw Landing Zone', primaryAttribute: 's3://eventide-raw-landing', description: 'S3 bucket where unprocessed vendor files land.' },
+  { id: 'news-scraper', type: 'source', subtype: 'scraper', label: 'News Scraper', primaryAttribute: 'reuters.com/markets, bloomberg.com/markets', description: 'Scrapes financial news sites for headlines.' },
+  { id: 'vendor-ftp', type: 'source', subtype: 'ftp', label: 'Vendor FTP', primaryAttribute: 'ftp.vendor-data.com', description: 'Nightly FTP drop from a third-party data vendor.' },
 
   // --- Processes ---
-  { id: 'ingest-bloomberg', type: 'process', subtype: 'cron-script', label: 'ingest_bloomberg.py', schedule: '*/5 * * * *', description: 'Pulls latest ticks from Bloomberg and lands raw JSON.' },
-  { id: 'normalize-prices', type: 'process', subtype: 'child-script', label: 'normalize_prices.py', description: 'Child of ingest_bloomberg.py — normalizes ticks into a common schema.' },
-  { id: 'risk-model', type: 'process', subtype: 'cron-script', label: 'risk_model.py', schedule: '0 * * * *', description: 'Hourly VaR / risk metric computation.' },
-  { id: 'risk-worker-1', type: 'process', subtype: 'child-script', label: 'risk_worker (shard 1)', description: 'Parallel worker spawned by risk_model.py for shard 1.' },
-  { id: 'risk-worker-2', type: 'process', subtype: 'child-script', label: 'risk_worker (shard 2)', description: 'Parallel worker spawned by risk_model.py for shard 2.' },
-  { id: 'news-sentiment', type: 'process', subtype: 'script', label: 'news_sentiment.py', description: 'Scores scraped headlines for sentiment.' },
-  { id: 'reconcile-positions', type: 'process', subtype: 'cron-script', label: 'reconcile_positions.py', schedule: '30 22 * * *', description: 'Nightly reconciliation of trading positions.' },
-  { id: 'vendor-sync', type: 'process', subtype: 'cron-script', label: 'vendor_sync.py', schedule: '0 3 * * *', description: 'Pulls and parses the nightly vendor FTP drop.' },
-  { id: 'report-builder', type: 'process', subtype: 'script', label: 'report_builder.py', description: 'Assembles the daily report from risk and position data.' },
-  { id: 'alerting-engine', type: 'process', subtype: 'script', label: 'alerting_engine.py', description: 'Evaluates thresholds across risk and sentiment signals.' },
+  { id: 'ingest-bloomberg', type: 'process', subtype: 'cron-script', label: 'ingest_bloomberg.py', primaryAttribute: '*/5 * * * *', description: 'Pulls latest ticks from Bloomberg and lands raw JSON.' },
+  { id: 'normalize-prices', type: 'process', subtype: 'child-script', label: 'normalize_prices.py', primaryAttribute: '/opt/pipelines/ingest/normalize_prices.py', description: 'Child of ingest_bloomberg.py — normalizes ticks into a common schema.' },
+  { id: 'risk-model', type: 'process', subtype: 'cron-script', label: 'risk_model.py', primaryAttribute: '0 * * * *', description: 'Hourly VaR / risk metric computation.' },
+  { id: 'risk-worker-1', type: 'process', subtype: 'child-script', label: 'risk_worker (shard 1)', primaryAttribute: '/opt/pipelines/risk/risk_worker.py --shard 1', description: 'Parallel worker spawned by risk_model.py for shard 1.' },
+  { id: 'risk-worker-2', type: 'process', subtype: 'child-script', label: 'risk_worker (shard 2)', primaryAttribute: '/opt/pipelines/risk/risk_worker.py --shard 2', description: 'Parallel worker spawned by risk_model.py for shard 2.' },
+  { id: 'news-sentiment', type: 'process', subtype: 'script', label: 'news_sentiment.py', primaryAttribute: '/opt/pipelines/news/news_sentiment.py', description: 'Scores scraped headlines for sentiment.' },
+  { id: 'reconcile-positions', type: 'process', subtype: 'cron-script', label: 'reconcile_positions.py', primaryAttribute: '30 22 * * *', description: 'Nightly reconciliation of trading positions.' },
+  { id: 'vendor-sync', type: 'process', subtype: 'cron-script', label: 'vendor_sync.py', primaryAttribute: '0 3 * * *', description: 'Pulls and parses the nightly vendor FTP drop.' },
+  { id: 'report-builder', type: 'process', subtype: 'script', label: 'report_builder.py', primaryAttribute: '/opt/pipelines/reporting/report_builder.py', description: 'Assembles the daily report from risk and position data.' },
+  { id: 'alerting-engine', type: 'process', subtype: 'script', label: 'alerting_engine.py', primaryAttribute: '/opt/pipelines/risk/alerting_engine.py', description: 'Evaluates thresholds across risk and sentiment signals.' },
 
   // --- Outputs ---
-  { id: 'website-dashboard', type: 'output', subtype: 'website', label: 'Website Dashboard', description: 'Internal dashboard rendering live report data.' },
-  { id: 'email-digest', type: 'output', subtype: 'email', label: 'Morning Email Digest', description: 'Daily email summary sent to stakeholders.' },
-  { id: 'sql-positions', type: 'output', subtype: 'sql-table', label: 'SQL: positions_clean', description: 'Cleaned, reconciled positions table.' },
-  { id: 'sql-risk', type: 'output', subtype: 'sql-table', label: 'SQL: risk_metrics', description: 'Computed risk metrics table.' },
-  { id: 'slack-alerts', type: 'output', subtype: 'slack', label: 'Slack Risk Alerts', description: 'Real-time alert messages posted to #risk-alerts.' },
-  { id: 'pdf-report', type: 'output', subtype: 'pdf', label: 'PDF Investor Report', description: 'Formatted PDF distributed to investors.' },
-  { id: 's3-archive', type: 'output', subtype: 'archive', label: 'S3 Archive', description: 'Long-term cold storage of normalized price history.' },
+  { id: 'website-dashboard', type: 'output', subtype: 'website', label: 'Website Dashboard', primaryAttribute: 'https://dashboard.internal.eventide.com', description: 'Internal dashboard rendering live report data.' },
+  { id: 'email-digest', type: 'output', subtype: 'email', label: 'Morning Email Digest', primaryAttribute: 'trading-desk@eventide.com', description: 'Daily email summary sent to stakeholders.' },
+  { id: 'sql-positions', type: 'output', subtype: 'sql-table', label: 'SQL: positions_clean', primaryAttribute: 'positions_clean', description: 'Cleaned, reconciled positions table.' },
+  { id: 'sql-risk', type: 'output', subtype: 'sql-table', label: 'SQL: risk_metrics', primaryAttribute: 'risk_metrics', description: 'Computed risk metrics table.' },
+  { id: 'slack-alerts', type: 'output', label: 'Slack Risk Alerts', primaryAttribute: '#risk-alerts', description: 'Real-time alert messages posted to #risk-alerts.' },
+  { id: 'pdf-report', type: 'output', subtype: 'pdf', label: 'PDF Investor Report', primaryAttribute: '/reports/investor_report.pdf', description: 'Formatted PDF distributed to investors.' },
+  { id: 's3-archive', type: 'output', subtype: 'object-storage', label: 'S3 Archive', primaryAttribute: 's3://eventide-price-archive', description: 'Long-term cold storage of normalized price history.' },
 
   // --- Stakeholders ---
-  { id: 'cio', type: 'stakeholder', label: 'CIO', description: 'Receives the daily investor report and email digest.' },
+  { id: 'cio', type: 'stakeholder', label: 'CIO', primaryAttribute: 'Investment Office', description: 'Receives the daily investor report and email digest.' },
 
   // --- Secondary server: APAC desk (near-self-contained regional node) ---
   { id: 'apac-nucleus', type: 'nucleus', label: 'APAC Desk', description: 'Secondary regional server — mirrors the core pipeline for APAC markets, mostly self-contained.' },
-  { id: 'apac-feed', type: 'source', subtype: 'api', label: 'SGX Feed', description: 'Real-time market data feed for APAC exchanges.' },
-  { id: 'apac-risk', type: 'process', subtype: 'cron-script', label: 'apac_risk.py', schedule: '0 * * * *', description: 'Hourly regional VaR computation, mirrors risk_model.py.' },
-  { id: 'apac-report', type: 'output', subtype: 'pdf', label: 'APAC PDF Report', description: 'Formatted regional report distributed to APAC stakeholders.' },
+  { id: 'apac-feed', type: 'source', subtype: 'api', label: 'SGX Feed', primaryAttribute: 'https://api.sgx.com/market-data', description: 'Real-time market data feed for APAC exchanges.' },
+  { id: 'apac-risk', type: 'process', subtype: 'cron-script', label: 'apac_risk.py', primaryAttribute: '0 * * * *', description: 'Hourly regional VaR computation, mirrors risk_model.py.' },
+  { id: 'apac-report', type: 'output', subtype: 'pdf', label: 'APAC PDF Report', primaryAttribute: '/reports/apac_report.pdf', description: 'Formatted regional report distributed to APAC stakeholders.' },
 ]
 
 const edgeDefs: Array<Omit<GraphEdge, 'id'>> = [
@@ -66,7 +66,7 @@ const edgeDefs: Array<Omit<GraphEdge, 'id'>> = [
   { source: 'vendor-ftp', target: 'vendor-sync', kind: 'feeds', volume: 1 },
 
   // process -> process (spawning / child relationships)
-  { source: 'ingest-bloomberg', target: 'normalize-prices', kind: 'spawns', volume: 9 },
+  { source: 'ingest-bloomberg', target: 'normalize-prices', kind: 'calls', volume: 9 },
   { source: 'risk-model', target: 'risk-worker-1', kind: 'spawns', volume: 3 },
   { source: 'risk-model', target: 'risk-worker-2', kind: 'spawns', volume: 3 },
 

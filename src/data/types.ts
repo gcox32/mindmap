@@ -13,9 +13,7 @@ export type NodeSubtype =
   | 'website'
   | 'email'
   | 'sql-table'
-  | 'slack'
   | 'pdf'
-  | 'archive'
 
 export interface GraphNode {
   id: string
@@ -23,12 +21,24 @@ export interface GraphNode {
   subtype?: NodeSubtype
   label: string
   description?: string
-  /** e.g. "0 6 * * *" for cron-tied processes */
-  schedule?: string
+  /**
+   * Single canonical descriptive value for this node's subtype (or, for
+   * stakeholders, its type) — e.g. a cron expression for cron-script, a
+   * file path for script/child-script, a URL for website. Meaning and
+   * label are looked up per subtype via NODE_PRIMARY_ATTRIBUTE_LABEL in
+   * graph/style.ts. Free text rather than per-subtype typed fields, so it
+   * doubles as a groupable value (e.g. stakeholders by department).
+   */
+  primaryAttribute?: string
 }
 
-/** `hosts` marks tight structural coupling (e.g. a server hosting the database it runs), not a data flow. */
-export type EdgeKind = 'feeds' | 'spawns' | 'produces' | 'cycles' | 'hosts'
+/**
+ * `hosts` marks tight structural coupling (e.g. a server hosting the database it runs), not a data flow.
+ * `spawns` vs `calls`: both are control flow between scripts, not data flow (that's `feeds`/`produces`).
+ * `spawns` is fan-out — a script forking concurrent worker instances. `calls` is a sequential one-to-one
+ * handoff to the next stage in a pipeline.
+ */
+export type EdgeKind = 'feeds' | 'spawns' | 'calls' | 'produces' | 'cycles' | 'hosts'
 
 export interface GraphEdge {
   id: string
