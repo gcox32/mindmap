@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Plus } from 'lucide-react'
-import type { EdgeKind, GraphNode } from '@/data/types'
+import type { EdgeKind, GraphEdge, GraphNode } from '@/data/types'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import type { EdgeManagerState } from './useEdgeManager'
 
 const TAP_TRANSITION = { duration: 0.15 }
@@ -9,11 +10,28 @@ const EDGE_KINDS: EdgeKind[] = ['feeds', 'spawns', 'produces', 'cycles', 'hosts'
 
 interface EdgeFormProps {
   nodes: GraphNode[]
+  edges: GraphEdge[]
   manager: EdgeManagerState
 }
 
-export function EdgeForm({ nodes, manager }: EdgeFormProps) {
-  const { editingId, form, setForm, error, busy, startCreate, setId, setSource, setTarget, setKind, handleSubmit } = manager
+export function EdgeForm({ nodes, edges, manager }: EdgeFormProps) {
+  const {
+    editingId,
+    form,
+    setForm,
+    error,
+    busy,
+    deleteTarget,
+    setDeleteTarget,
+    startCreate,
+    setId,
+    setSource,
+    setTarget,
+    setKind,
+    confirmDelete,
+    handleSubmit,
+  } = manager
+  const editingEdge = editingId ? edges.find((e) => e.id === editingId) ?? null : null
 
   return (
     <>
@@ -95,8 +113,27 @@ export function EdgeForm({ nodes, manager }: EdgeFormProps) {
           <button type="submit" className="primary-btn" disabled={busy}>
             {editingId ? 'Save' : 'Create'}
           </button>
+          {editingEdge && (
+            <button
+              type="button"
+              className="primary-btn primary-btn--danger"
+              onClick={() => setDeleteTarget(editingEdge)}
+              disabled={busy}
+            >
+              Delete
+            </button>
+          )}
         </div>
       </form>
+
+      <ConfirmModal
+        isOpen={deleteTarget !== null}
+        title="Delete edge"
+        message="Delete this edge?"
+        busy={busy}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   )
 }

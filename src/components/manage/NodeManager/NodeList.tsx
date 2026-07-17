@@ -1,7 +1,6 @@
-import { Pencil, Trash2 } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import type { GraphNode } from '@/data/types'
 import { NODE_COLOR } from '@/graph/style'
-import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import type { NodeManagerState } from './useNodeManager'
 
 interface NodeListProps {
@@ -10,7 +9,20 @@ interface NodeListProps {
 }
 
 export function NodeList({ nodes, manager }: NodeListProps) {
-  const { editingId, busy, deleteTarget, setDeleteTarget, startEdit, confirmDelete } = manager
+  const { editingId, startEdit } = manager
+  const [search, setSearch] = useState('')
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return nodes
+    return nodes.filter(
+      (node) =>
+        node.label.toLowerCase().includes(q) ||
+        node.id.toLowerCase().includes(q) ||
+        node.type.toLowerCase().includes(q) ||
+        (node.subtype ?? '').toLowerCase().includes(q),
+    )
+  }, [nodes, search])
 
   return (
     <>
@@ -18,38 +30,28 @@ export function NodeList({ nodes, manager }: NodeListProps) {
         <h3 className="manage-panel-title">Nodes</h3>
       </div>
 
+      <input
+        className="manage-search"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search nodes..."
+      />
+
       <div className="manage-list">
-        {nodes.map((node) => (
-          <div key={node.id} className={`manage-list-row${editingId === node.id ? ' manage-list-row--active' : ''}`}>
+        {filtered.map((node) => (
+          <button
+            type="button"
+            key={node.id}
+            className={`manage-list-row${editingId === node.id ? ' manage-list-row--active' : ''}`}
+            onClick={() => startEdit(node)}
+          >
             <span className="type-dot" style={{ background: NODE_COLOR[node.type] }} />
             <span className="manage-list-label">
               {node.label} <span className="manage-list-sub">{node.id}</span>
             </span>
-            <span className="manage-list-actions">
-              <button className="icon-btn" onClick={() => startEdit(node)} aria-label={`Edit ${node.label}`}>
-                <Pencil size={14} />
-              </button>
-              <button
-                className="icon-btn icon-btn--danger"
-                onClick={() => setDeleteTarget(node)}
-                aria-label={`Delete ${node.label}`}
-                disabled={busy}
-              >
-                <Trash2 size={14} />
-              </button>
-            </span>
-          </div>
+          </button>
         ))}
       </div>
-
-      <ConfirmModal
-        isOpen={deleteTarget !== null}
-        title="Delete node"
-        message={`Delete node "${deleteTarget?.id}"? Edges connected to it will also be deleted.`}
-        busy={busy}
-        onConfirm={confirmDelete}
-        onCancel={() => setDeleteTarget(null)}
-      />
     </>
   )
 }

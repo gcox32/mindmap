@@ -1,7 +1,6 @@
-import { Pencil, Trash2 } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import type { GraphEdge } from '@/data/types'
 import { EDGE_COLOR } from '@/graph/style'
-import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import type { EdgeManagerState } from './useEdgeManager'
 
 interface EdgeListProps {
@@ -10,7 +9,23 @@ interface EdgeListProps {
 }
 
 export function EdgeList({ edges, manager }: EdgeListProps) {
-  const { nodeById, editingId, busy, deleteTarget, setDeleteTarget, startEdit, confirmDelete } = manager
+  const { nodeById, editingId, startEdit } = manager
+  const [search, setSearch] = useState('')
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return edges
+    return edges.filter((edge) => {
+      const source = nodeById.get(edge.source)
+      const target = nodeById.get(edge.target)
+      return (
+        (source?.label ?? edge.source).toLowerCase().includes(q) ||
+        (target?.label ?? edge.target).toLowerCase().includes(q) ||
+        edge.kind.toLowerCase().includes(q) ||
+        edge.id.toLowerCase().includes(q)
+      )
+    })
+  }, [edges, nodeById, search])
 
   return (
     <>
@@ -18,12 +33,24 @@ export function EdgeList({ edges, manager }: EdgeListProps) {
         <h3 className="manage-panel-title">Edges</h3>
       </div>
 
+      <input
+        className="manage-search"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search edges..."
+      />
+
       <div className="manage-list">
-        {edges.map((edge) => {
+        {filtered.map((edge) => {
           const source = nodeById.get(edge.source)
           const target = nodeById.get(edge.target)
           return (
-            <div key={edge.id} className={`manage-list-row${editingId === edge.id ? ' manage-list-row--active' : ''}`}>
+            <button
+              type="button"
+              key={edge.id}
+              className={`manage-list-row${editingId === edge.id ? ' manage-list-row--active' : ''}`}
+              onClick={() => startEdit(edge)}
+            >
               <span className="type-dot" style={{ background: EDGE_COLOR[edge.kind] }} />
               <span className="manage-list-label">
                 {source?.label ?? edge.source} → {target?.label ?? edge.target}{' '}
@@ -31,32 +58,10 @@ export function EdgeList({ edges, manager }: EdgeListProps) {
                   {edge.kind} · {edge.volume}
                 </span>
               </span>
-              <span className="manage-list-actions">
-                <button className="icon-btn" onClick={() => startEdit(edge)} aria-label="Edit edge">
-                  <Pencil size={14} />
-                </button>
-                <button
-                  className="icon-btn icon-btn--danger"
-                  onClick={() => setDeleteTarget(edge)}
-                  aria-label="Delete edge"
-                  disabled={busy}
-                >
-                  <Trash2 size={14} />
-                </button>
-              </span>
-            </div>
+            </button>
           )
         })}
       </div>
-
-      <ConfirmModal
-        isOpen={deleteTarget !== null}
-        title="Delete edge"
-        message="Delete this edge?"
-        busy={busy}
-        onConfirm={confirmDelete}
-        onCancel={() => setDeleteTarget(null)}
-      />
     </>
   )
 }

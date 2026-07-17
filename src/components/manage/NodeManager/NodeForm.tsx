@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Plus } from 'lucide-react'
-import type { NodeSubtype, NodeType } from '@/data/types'
+import type { GraphNode, NodeSubtype, NodeType } from '@/data/types'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import type { NodeManagerState } from './useNodeManager'
 
 const TAP_TRANSITION = { duration: 0.15 }
@@ -25,11 +26,26 @@ const NODE_SUBTYPES: NodeSubtype[] = [
 ]
 
 interface NodeFormProps {
+  nodes: GraphNode[]
   manager: NodeManagerState
 }
 
-export function NodeForm({ manager }: NodeFormProps) {
-  const { editingId, form, setForm, error, busy, startCreate, setId, setLabel, handleSubmit } = manager
+export function NodeForm({ nodes, manager }: NodeFormProps) {
+  const {
+    editingId,
+    form,
+    setForm,
+    error,
+    busy,
+    deleteTarget,
+    setDeleteTarget,
+    startCreate,
+    setId,
+    setLabel,
+    confirmDelete,
+    handleSubmit,
+  } = manager
+  const editingNode = editingId ? nodes.find((n) => n.id === editingId) ?? null : null
 
   return (
     <>
@@ -111,8 +127,27 @@ export function NodeForm({ manager }: NodeFormProps) {
           <button type="submit" className="primary-btn" disabled={busy}>
             {editingId ? 'Save' : 'Create'}
           </button>
+          {editingNode && (
+            <button
+              type="button"
+              className="primary-btn primary-btn--danger"
+              onClick={() => setDeleteTarget(editingNode)}
+              disabled={busy}
+            >
+              Delete
+            </button>
+          )}
         </div>
       </form>
+
+      <ConfirmModal
+        isOpen={deleteTarget !== null}
+        title="Delete node"
+        message={`Delete node "${deleteTarget?.id}"? Edges connected to it will also be deleted.`}
+        busy={busy}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   )
 }

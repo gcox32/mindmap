@@ -42,10 +42,10 @@ export function ManageOverlay({
         <NodeList nodes={nodes} manager={nodeManager} />
       </motion.div>
       <motion.div className="manage-panel manage-panel--form" layout transition={SPRING_GENTLE}>
-        <NodeForm manager={nodeManager} />
+        <NodeForm nodes={nodes} manager={nodeManager} />
       </motion.div>
       <motion.div className="manage-panel manage-panel--form" layout transition={SPRING_GENTLE}>
-        <EdgeForm nodes={nodes} manager={edgeManager} />
+        <EdgeForm nodes={nodes} edges={edges} manager={edgeManager} />
       </motion.div>
       <motion.div className="manage-panel manage-panel--list" layout transition={SPRING_GENTLE}>
         <EdgeList edges={edges} manager={edgeManager} />
