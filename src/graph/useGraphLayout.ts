@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { forceSimulation, forceManyBody, forceLink, forceCenter, forceCollide } from 'd3-force-3d'
 import type { SimulationNodeDatum3D, SimulationLinkDatum3D } from 'd3-force-3d'
 import type { GraphNode, GraphEdge, PositionedNode } from '@/data/types'
@@ -87,9 +87,21 @@ function forceCluster() {
   return force
 }
 
-/** Runs a 3D force simulation once (synchronously) and returns final node positions. */
-export function computeLayout(nodes: GraphNode[], edges: GraphEdge[]): PositionedNode[] {
-  const simNodes: SimNode[] = nodes.map((n) => ({ ...n }))
+type SeedPositions = Map<string, { x: number; y: number; z: number }>
+
+/**
+ * Runs a 3D force simulation once (synchronously) and returns final node positions.
+ * `seedPositions`, when given, primes matching nodes (by id) with their prior
+ * coordinates before the simulation starts, so an incremental data change (e.g.
+ * adding one node) settles near the existing layout instead of the whole graph
+ * re-randomizing from scratch. Nodes with no prior entry (new nodes) get d3's
+ * default random initial placement.
+ */
+export function computeLayout(nodes: GraphNode[], edges: GraphEdge[], seedPositions?: SeedPositions): PositionedNode[] {
+  const simNodes: SimNode[] = nodes.map((n) => {
+    const seed = seedPositions?.get(n.id)
+    return seed ? { ...n, x: seed.x, y: seed.y, z: seed.z } : { ...n }
+  })
   const simLinks: SimLink[] = edges.map((e) => ({ source: e.source, target: e.target, kind: e.kind }))
 
   const simulation = forceSimulation<SimNode>(simNodes, 3)
@@ -135,7 +147,18 @@ export function computeLayout(nodes: GraphNode[], edges: GraphEdge[]): Positione
   }))
 }
 
-/** Memoized layout — recomputes only if the node/edge arrays themselves change identity. */
+/**
+ * Memoized layout — recomputes only if the node/edge arrays themselves change identity.
+ * Carries positions forward across recomputes (via a ref, outside the memo dependency
+ * list) so incremental data changes settle near the previous layout rather than
+ * re-randomizing every node in the graph.
+ */
 export function useGraphLayout(nodes: GraphNode[], edges: GraphEdge[]): PositionedNode[] {
-  return useMemo(() => computeLayout(nodes, edges), [nodes, edges])
+  const previousPositions = useRef<SeedPositions>(new Map())
+
+  return useMemo(() => {
+    const positioned = computeLayout(nodes, edges, previousPositions.current)
+    previousPositions.current = new Map(positioned.map((n) => [n.id, { x: n.x, y: n.y, z: n.z }]))
+    return positioned
+  }, [nodes, edges])
 }
