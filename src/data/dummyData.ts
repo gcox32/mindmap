@@ -37,6 +37,9 @@ export const nodes: GraphNode[] = [
 
   // --- Stakeholders ---
   { id: 'cio', type: 'stakeholder', label: 'CIO', primaryAttribute: 'Investment Office', description: 'Receives the daily investor report and email digest.' },
+  { id: 'portfolio-manager', type: 'stakeholder', label: 'Portfolio Manager', primaryAttribute: 'Investment Office', description: 'Receives the morning email digest.' },
+  { id: 'compliance-officer', type: 'stakeholder', label: 'Compliance Officer', primaryAttribute: 'Compliance', description: 'Monitors real-time risk alerts.' },
+  { id: 'risk-analyst', type: 'stakeholder', label: 'Risk Analyst', primaryAttribute: 'Compliance', description: 'Reviews the live dashboard for risk breaches.' },
 
   // --- Secondary server: APAC desk (near-self-contained regional node) ---
   { id: 'apac-nucleus', type: 'nucleus', label: 'APAC Desk', description: 'Secondary regional server — mirrors the core pipeline for APAC markets, mostly self-contained.' },
@@ -88,8 +91,11 @@ const edgeDefs: Array<Omit<GraphEdge, 'id'>> = [
   { source: 'report-builder', target: 'email-digest', kind: 'produces', volume: 1 },
   { source: 'report-builder', target: 'pdf-report', kind: 'produces', volume: 1 },
 
-  // output reaches its stakeholder
+  // outputs reach their stakeholders
   { source: 'pdf-report', target: 'cio', kind: 'feeds', volume: 1 },
+  { source: 'email-digest', target: 'portfolio-manager', kind: 'feeds', volume: 1 },
+  { source: 'slack-alerts', target: 'compliance-officer', kind: 'feeds', volume: 1 },
+  { source: 'website-dashboard', target: 'risk-analyst', kind: 'feeds', volume: 1 },
 
   // feedback loop: an output becomes a source for another process
   { source: 'sql-positions', target: 'risk-model', kind: 'cycles', volume: 2 },

@@ -43,6 +43,50 @@ const DEFAULT_LINK_STRENGTH = 0.5
 type SimNode = GraphNode & SimulationNodeDatum3D
 type SimLink = SimulationLinkDatum3D<SimNode> & { kind: GraphEdge['kind'] }
 
+// Groups nodes that share a (type, subtype, primaryAttribute) combination —
+// e.g. stakeholders with the same department, or later databases with the
+// same engine. Nodes without a primaryAttribute aren't clustered.
+function clusterKey(n: SimNode): string | undefined {
+  return n.primaryAttribute ? `${n.type}::${n.subtype ?? ''}::${n.primaryAttribute}` : undefined
+}
+
+const CLUSTER_STRENGTH = 0.15
+
+/** Custom d3 force: pulls each node toward the centroid of its cluster (see clusterKey). */
+function forceCluster() {
+  let nodes: SimNode[] = []
+
+  function force(alpha: number) {
+    const centroids = new Map<string, { x: number; y: number; z: number; count: number }>()
+    for (const n of nodes) {
+      const key = clusterKey(n)
+      if (!key) continue
+      const c = centroids.get(key) ?? { x: 0, y: 0, z: 0, count: 0 }
+      c.x += n.x ?? 0
+      c.y += n.y ?? 0
+      c.z += n.z ?? 0
+      c.count++
+      centroids.set(key, c)
+    }
+
+    for (const n of nodes) {
+      const key = clusterKey(n)
+      if (!key) continue
+      const c = centroids.get(key)!
+      if (c.count <= 1) continue
+      n.vx = (n.vx ?? 0) - ((n.x ?? 0) - c.x / c.count) * CLUSTER_STRENGTH * alpha
+      n.vy = (n.vy ?? 0) - ((n.y ?? 0) - c.y / c.count) * CLUSTER_STRENGTH * alpha
+      n.vz = (n.vz ?? 0) - ((n.z ?? 0) - c.z / c.count) * CLUSTER_STRENGTH * alpha
+    }
+  }
+
+  force.initialize = (_nodes: SimNode[]) => {
+    nodes = _nodes
+  }
+
+  return force
+}
+
 /** Runs a 3D force simulation once (synchronously) and returns final node positions. */
 export function computeLayout(nodes: GraphNode[], edges: GraphEdge[]): PositionedNode[] {
   const simNodes: SimNode[] = nodes.map((n) => ({ ...n }))
@@ -65,6 +109,7 @@ export function computeLayout(nodes: GraphNode[], edges: GraphEdge[]): Positione
       'collide',
       forceCollide().radius((d) => getNodeRadius(d as SimNode) * COLLIDE_SCALE + COLLIDE_PADDING),
     )
+    .force('cluster', forceCluster())
     .stop()
 
   // Only the *first* nucleus (the primary/central server, by data ordering)

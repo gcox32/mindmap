@@ -10,12 +10,12 @@ import (
 )
 
 type nodeRequest struct {
-	ID          string  `json:"id"`
-	Type        string  `json:"type"`
-	Subtype     *string `json:"subtype"`
-	Label       string  `json:"label"`
-	Description *string `json:"description"`
-	Schedule    *string `json:"schedule"`
+	ID               string  `json:"id"`
+	Type             string  `json:"type"`
+	Subtype          *string `json:"subtype"`
+	Label            string  `json:"label"`
+	Description      *string `json:"description"`
+	PrimaryAttribute *string `json:"primaryAttribute"`
 }
 
 func (s *Server) listNodes(w http.ResponseWriter, r *http.Request) {
@@ -55,12 +55,12 @@ func (s *Server) createNode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	node, err := s.queries.CreateNode(r.Context(), db.CreateNodeParams{
-		ID:          req.ID,
-		Type:        req.Type,
-		Subtype:     req.Subtype,
-		Label:       req.Label,
-		Description: req.Description,
-		Schedule:    req.Schedule,
+		ID:               req.ID,
+		Type:             req.Type,
+		Subtype:          req.Subtype,
+		Label:            req.Label,
+		Description:      req.Description,
+		PrimaryAttribute: req.PrimaryAttribute,
 	})
 	if err != nil {
 		writeError(w, http.StatusBadRequest, err.Error())
@@ -81,12 +81,12 @@ func (s *Server) updateNode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	node, err := s.queries.UpdateNode(r.Context(), db.UpdateNodeParams{
-		ID:          r.PathValue("id"),
-		Type:        req.Type,
-		Subtype:     req.Subtype,
-		Label:       req.Label,
-		Description: req.Description,
-		Schedule:    req.Schedule,
+		ID:               r.PathValue("id"),
+		Type:             req.Type,
+		Subtype:          req.Subtype,
+		Label:            req.Label,
+		Description:      req.Description,
+		PrimaryAttribute: req.PrimaryAttribute,
 	})
 	if errors.Is(err, pgx.ErrNoRows) {
 		writeError(w, http.StatusNotFound, "node not found")

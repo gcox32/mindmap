@@ -47,7 +47,7 @@ export function NodeList({ nodes, manager }: NodeListProps) {
           >
             <span className="type-dot" style={{ background: NODE_COLOR[node.type] }} />
             <span className="manage-list-label">
-              {node.label} <span className="manage-list-sub">{node.id}</span>
+              {node.label}
             </span>
           </button>
         ))}

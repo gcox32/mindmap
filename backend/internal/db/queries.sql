@@ -5,14 +5,14 @@ SELECT * FROM mindmap.nodes ORDER BY id;
 SELECT * FROM mindmap.nodes WHERE id = sqlc.arg(id);
 
 -- name: CreateNode :one
-INSERT INTO mindmap.nodes (id, type, subtype, label, description, schedule)
+INSERT INTO mindmap.nodes (id, type, subtype, label, description, primary_attribute)
 VALUES (
     sqlc.arg(id),
     sqlc.arg(type),
     sqlc.narg(subtype),
     sqlc.arg(label),
     sqlc.narg(description),
-    sqlc.narg(schedule)
+    sqlc.narg(primary_attribute)
 )
 RETURNING *;
 
@@ -23,7 +23,7 @@ SET
     subtype = sqlc.narg(subtype),
     label = sqlc.arg(label),
     description = sqlc.narg(description),
-    schedule = sqlc.narg(schedule)
+    primary_attribute = sqlc.narg(primary_attribute)
 WHERE id = sqlc.arg(id)
 RETURNING *;
 

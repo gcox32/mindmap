@@ -43,7 +43,7 @@ func (q *Queries) CreateEdge(ctx context.Context, arg CreateEdgeParams) (Mindmap
 }
 
 const createNode = `-- name: CreateNode :one
-INSERT INTO mindmap.nodes (id, type, subtype, label, description, schedule)
+INSERT INTO mindmap.nodes (id, type, subtype, label, description, primary_attribute)
 VALUES (
     $1,
     $2,
@@ -52,16 +52,16 @@ VALUES (
     $5,
     $6
 )
-RETURNING id, type, subtype, label, description, schedule
+RETURNING id, type, subtype, label, description, primary_attribute
 `
 
 type CreateNodeParams struct {
-	ID          string  `json:"id"`
-	Type        string  `json:"type"`
-	Subtype     *string `json:"subtype"`
-	Label       string  `json:"label"`
-	Description *string `json:"description"`
-	Schedule    *string `json:"schedule"`
+	ID               string  `json:"id"`
+	Type             string  `json:"type"`
+	Subtype          *string `json:"subtype"`
+	Label            string  `json:"label"`
+	Description      *string `json:"description"`
+	PrimaryAttribute *string `json:"primaryAttribute"`
 }
 
 func (q *Queries) CreateNode(ctx context.Context, arg CreateNodeParams) (MindmapNode, error) {
@@ -71,7 +71,7 @@ func (q *Queries) CreateNode(ctx context.Context, arg CreateNodeParams) (Mindmap
 		arg.Subtype,
 		arg.Label,
 		arg.Description,
-		arg.Schedule,
+		arg.PrimaryAttribute,
 	)
 	var i MindmapNode
 	err := row.Scan(
@@ -80,7 +80,7 @@ func (q *Queries) CreateNode(ctx context.Context, arg CreateNodeParams) (Mindmap
 		&i.Subtype,
 		&i.Label,
 		&i.Description,
-		&i.Schedule,
+		&i.PrimaryAttribute,
 	)
 	return i, err
 }
@@ -121,7 +121,7 @@ func (q *Queries) GetEdge(ctx context.Context, id string) (MindmapEdge, error) {
 }
 
 const getNode = `-- name: GetNode :one
-SELECT id, type, subtype, label, description, schedule FROM mindmap.nodes WHERE id = $1
+SELECT id, type, subtype, label, description, primary_attribute FROM mindmap.nodes WHERE id = $1
 `
 
 func (q *Queries) GetNode(ctx context.Context, id string) (MindmapNode, error) {
@@ -133,7 +133,7 @@ func (q *Queries) GetNode(ctx context.Context, id string) (MindmapNode, error) {
 		&i.Subtype,
 		&i.Label,
 		&i.Description,
-		&i.Schedule,
+		&i.PrimaryAttribute,
 	)
 	return i, err
 }
@@ -169,7 +169,7 @@ func (q *Queries) ListEdges(ctx context.Context) ([]MindmapEdge, error) {
 }
 
 const listNodes = `-- name: ListNodes :many
-SELECT id, type, subtype, label, description, schedule FROM mindmap.nodes ORDER BY id
+SELECT id, type, subtype, label, description, primary_attribute FROM mindmap.nodes ORDER BY id
 `
 
 func (q *Queries) ListNodes(ctx context.Context) ([]MindmapNode, error) {
@@ -187,7 +187,7 @@ func (q *Queries) ListNodes(ctx context.Context) ([]MindmapNode, error) {
 			&i.Subtype,
 			&i.Label,
 			&i.Description,
-			&i.Schedule,
+			&i.PrimaryAttribute,
 		); err != nil {
 			return nil, err
 		}
@@ -244,18 +244,18 @@ SET
     subtype = $2,
     label = $3,
     description = $4,
-    schedule = $5
+    primary_attribute = $5
 WHERE id = $6
-RETURNING id, type, subtype, label, description, schedule
+RETURNING id, type, subtype, label, description, primary_attribute
 `
 
 type UpdateNodeParams struct {
-	Type        string  `json:"type"`
-	Subtype     *string `json:"subtype"`
-	Label       string  `json:"label"`
-	Description *string `json:"description"`
-	Schedule    *string `json:"schedule"`
-	ID          string  `json:"id"`
+	Type             string  `json:"type"`
+	Subtype          *string `json:"subtype"`
+	Label            string  `json:"label"`
+	Description      *string `json:"description"`
+	PrimaryAttribute *string `json:"primaryAttribute"`
+	ID               string  `json:"id"`
 }
 
 func (q *Queries) UpdateNode(ctx context.Context, arg UpdateNodeParams) (MindmapNode, error) {
@@ -264,7 +264,7 @@ func (q *Queries) UpdateNode(ctx context.Context, arg UpdateNodeParams) (Mindmap
 		arg.Subtype,
 		arg.Label,
 		arg.Description,
-		arg.Schedule,
+		arg.PrimaryAttribute,
 		arg.ID,
 	)
 	var i MindmapNode
@@ -274,7 +274,7 @@ func (q *Queries) UpdateNode(ctx context.Context, arg UpdateNodeParams) (Mindmap
 		&i.Subtype,
 		&i.Label,
 		&i.Description,
-		&i.Schedule,
+		&i.PrimaryAttribute,
 	)
 	return i, err
 }

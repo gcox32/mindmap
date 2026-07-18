@@ -3,23 +3,23 @@ import type { EdgeKind, NodeSubtype, NodeType } from '@/data/types'
 // Label for each subtype's single `primaryAttribute` value (see types.ts).
 // Stakeholder has no subtype, so it's keyed by type instead as a fallback.
 const PRIMARY_ATTRIBUTE_LABEL_BY_SUBTYPE: Partial<Record<NodeSubtype, string>> = {
-  'cron-script': 'Schedule',
-  script: 'Path',
-  'child-script': 'Path',
-  api: 'Endpoint',
-  database: 'Engine',
-  server: 'Host',
-  'object-storage': 'Bucket',
-  scraper: 'Target',
-  ftp: 'Host',
-  website: 'Address',
-  email: 'Recipients',
-  'sql-table': 'Table',
-  pdf: 'Path',
+  'cron-script': 'schedule',
+  script: 'path',
+  'child-script': 'path',
+  api: 'endpoint',
+  database: 'engine',
+  server: 'host',
+  'object-storage': 'bucket',
+  scraper: 'target',
+  ftp: 'host',
+  website: 'address',
+  email: 'recipients',
+  'sql-table': 'table',
+  pdf: 'path',
 }
 
 const PRIMARY_ATTRIBUTE_LABEL_BY_TYPE: Partial<Record<NodeType, string>> = {
-  stakeholder: 'Department',
+  stakeholder: 'department',
 }
 
 export function getPrimaryAttributeLabel(node: { type: NodeType; subtype?: NodeSubtype }): string | undefined {

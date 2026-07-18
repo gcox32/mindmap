@@ -13,10 +13,10 @@ type MindmapEdge struct {
 }
 
 type MindmapNode struct {
-	ID          string  `json:"id"`
-	Type        string  `json:"type"`
-	Subtype     *string `json:"subtype"`
-	Label       string  `json:"label"`
-	Description *string `json:"description"`
-	Schedule    *string `json:"schedule"`
+	ID               string  `json:"id"`
+	Type             string  `json:"type"`
+	Subtype          *string `json:"subtype"`
+	Label            string  `json:"label"`
+	Description      *string `json:"description"`
+	PrimaryAttribute *string `json:"primaryAttribute"`
 }
