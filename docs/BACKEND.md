@@ -216,22 +216,27 @@ that only bite in production, not local dev:
   above) only creates the `mindmap` *schema and tables* inside whatever
   database the connection string points at — it doesn't create the
   database or the Postgres role itself.
-- **The app's DB user needs `CREATE` the first time**, since `Migrate()`
-  runs `CREATE SCHEMA`/`CREATE TABLE ... IF NOT EXISTS` on every startup.
-  If the app's production credentials are deliberately scoped to
-  read/write DML only (common with stricter DBAs), pre-create the schema
-  once with elevated credentials instead:
-  ```bash
-  psql "postgres://<admin>:<pass>@<db-host>:5432/<dbname>?sslmode=require" \
-    -f backend/internal/db/schema.sql
-  ```
-  then grant the app's normal user access to what now exists:
-  ```sql
-  GRANT USAGE ON SCHEMA mindmap TO <app_user>;
-  GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA mindmap TO <app_user>;
-  ```
-  After that, the app's own migration step just sees everything already
-  exists and no-ops on every subsequent restart.
+- **The app's DB user needs `CREATE` on the `mindmap` schema**, since
+  `Migrate()` runs `CREATE SCHEMA`/`CREATE TABLE ... IF NOT EXISTS` on
+  every startup.
+
+### Setting up the app's Postgres role (prod)
+
+Run as an admin/superuser (e.g. `postgres`), against the target database:
+
+```sql
+CREATE ROLE mindmap WITH LOGIN PASSWORD '<generate-a-strong-secret>';
+CREATE SCHEMA IF NOT EXISTS mindmap;
+GRANT CREATE, USAGE ON SCHEMA mindmap TO mindmap;
+```
+
+No `SUPERUSER`/`CREATEDB`/`CREATEROLE` on the role itself, and `CREATE` is
+scoped to just the `mindmap` schema, not the whole database. With that in
+place, `Migrate()` (running as `mindmap`) creates the tables itself on
+first startup and — since it owns whatever it creates — already has full
+DML on them, no separate `GRANT SELECT, INSERT, UPDATE, DELETE` step
+needed. Same goes for any future table `schema.sql` adds: no default
+privileges to maintain, since the app's own role is what creates it.
 
 If Postgres itself is being stood up fresh rather than pointed at an
 existing instance, `docker-compose.yml` shows the `app`+`db` shape as a
