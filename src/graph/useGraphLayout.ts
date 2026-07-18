@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { forceSimulation, forceManyBody, forceLink, forceCenter, forceCollide } from 'd3-force-3d'
 import type { SimulationNodeDatum3D, SimulationLinkDatum3D } from 'd3-force-3d'
-import type { GraphNode, GraphEdge, PositionedNode } from '@/data/types'
+import type { GraphNode, GraphEdge, NodeSubtype, PositionedNode } from '@/data/types'
 import { getNodeRadius } from './style'
 
 // Collision radius scales off the same render radius as NodeMesh (roughly
@@ -20,6 +20,18 @@ const CHARGE_STRENGTH_BY_TYPE: Record<GraphNode['type'], number> = {
   process: -140,
   output: -140,
   stakeholder: -140,
+}
+
+// A `source`-type node with subtype `server` gets a smaller version of the
+// nucleus bonus above, so an important-but-not-primary server still holds
+// its own sub-cluster of satellites, without being pinned or competing for
+// the nucleus's origin-anchored role.
+const CHARGE_STRENGTH_BONUS_BY_SUBTYPE: Partial<Record<NodeSubtype, number>> = {
+  server: -160,
+}
+
+function chargeStrength(n: SimNode): number {
+  return CHARGE_STRENGTH_BY_TYPE[n.type] + (n.subtype ? (CHARGE_STRENGTH_BONUS_BY_SUBTYPE[n.subtype] ?? 0) : 0)
 }
 
 // `hosts` (a server subtype -> the database subtype it runs) is much
@@ -107,7 +119,7 @@ export function computeLayout(nodes: GraphNode[], edges: GraphEdge[], seedPositi
   const simulation = forceSimulation<SimNode>(simNodes, 3)
     .force(
       'charge',
-      forceManyBody().strength((d) => CHARGE_STRENGTH_BY_TYPE[(d as SimNode).type]),
+      forceManyBody().strength((d) => chargeStrength(d as SimNode)),
     )
     .force(
       'link',

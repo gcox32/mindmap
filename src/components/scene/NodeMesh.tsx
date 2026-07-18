@@ -29,11 +29,19 @@ const DIMMED_TEXT_COLOR = new THREE.Color('#4a5568')
 // glow sprites everything else uses.
 const DB_DISC_OFFSETS = [-0.55, 0, 0.55]
 
+// Vertical offsets (as a fraction of node radius) for the four slabs of the
+// `server` subtype's rack-unit badge — a stack of square plates that reads
+// as a server tower, distinct from the database's smooth disc stack.
+const SERVER_RACK_OFFSETS = [-0.6, -0.2, 0.2, 0.6]
+const SERVER_RACK_WIDTH = 1.7 // fraction of baseRadius
+const SERVER_RACK_UNIT_HEIGHT = 0.28 // fraction of baseRadius
+
 export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSelect, interactive }: NodeMeshProps) {
   const glowRef = useRef<THREE.Sprite>(null)
   const coreRef = useRef<THREE.Sprite>(null)
   const shellRef = useRef<THREE.Mesh>(null)
   const dbStackRef = useRef<THREE.Group>(null)
+  const serverRackRef = useRef<THREE.Group>(null)
   // troika-three-text's Text mesh isn't meaningfully typeable here; we only
   // touch .fillOpacity/.color imperatively, same as its own prop handling.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -97,6 +105,15 @@ export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSel
       for (const child of dbStackRef.current.children) {
         const disc = child as THREE.Group
         const [fill, outline] = disc.children as THREE.Mesh[]
+        ;(fill.material as THREE.MeshBasicMaterial).opacity = s.badgeOpacity * 0.45
+        ;(outline.material as THREE.MeshBasicMaterial).opacity = s.badgeOpacity
+      }
+    }
+    if (serverRackRef.current && node.subtype === 'server') {
+      serverRackRef.current.scale.setScalar(s.emphasis)
+      for (const child of serverRackRef.current.children) {
+        const unit = child as THREE.Group
+        const [fill, outline] = unit.children as THREE.Mesh[]
         ;(fill.material as THREE.MeshBasicMaterial).opacity = s.badgeOpacity * 0.45
         ;(outline.material as THREE.MeshBasicMaterial).opacity = s.badgeOpacity
       }
@@ -184,6 +201,33 @@ export function NodeMesh({ node, isHovered, isSelected, isDimmed, onHover, onSel
               </mesh>
               <mesh>
                 <cylinderGeometry args={[baseRadius * 0.9, baseRadius * 0.9, baseRadius * 0.32, 28]} />
+                <meshBasicMaterial color={color} wireframe transparent opacity={targetBadgeOpacity} depthWrite={false} />
+              </mesh>
+            </group>
+          ))}
+        </group>
+      )}
+
+      {node.subtype === 'server' && (
+        <group ref={serverRackRef}>
+          {SERVER_RACK_OFFSETS.map((offset) => (
+            <group key={offset} position={[0, offset * baseRadius, 0]}>
+              <mesh>
+                <boxGeometry
+                  args={[baseRadius * SERVER_RACK_WIDTH, baseRadius * SERVER_RACK_UNIT_HEIGHT, baseRadius * SERVER_RACK_WIDTH]}
+                />
+                <meshBasicMaterial
+                  color={color}
+                  transparent
+                  opacity={targetBadgeOpacity * 0.45}
+                  blending={THREE.AdditiveBlending}
+                  depthWrite={false}
+                />
+              </mesh>
+              <mesh>
+                <boxGeometry
+                  args={[baseRadius * SERVER_RACK_WIDTH, baseRadius * SERVER_RACK_UNIT_HEIGHT, baseRadius * SERVER_RACK_WIDTH]}
+                />
                 <meshBasicMaterial color={color} wireframe transparent opacity={targetBadgeOpacity} depthWrite={false} />
               </mesh>
             </group>
