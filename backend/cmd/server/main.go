@@ -25,7 +25,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/api/", api.NewRouter(queries))
-	mux.Handle("/", api.SPAHandler(cfg.DistDir))
+	mux.Handle("/", http.FileServer(http.Dir(cfg.DistDir)))
 
 	log.Printf("listening on :%s", cfg.Port)
 	if err := http.ListenAndServe(":"+cfg.Port, mux); err != nil {
